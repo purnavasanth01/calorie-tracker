@@ -1,0 +1,31 @@
+@if (auth.currentUser(); as user) {
+  <header class="navbar">
+    <div class="navbar-inner">
+      <a class="brand" routerLink="/dashboard">
+        <span class="brand-mark">🔥</span>
+        CalTrack
+      </a>
+
+      <nav class="tabs">
+        <a routerLink="/dashboard" routerLinkActive="active">Dashboard</a>
+        <a routerLink="/predict" routerLinkActive="active">Log Workout</a>
+        <a routerLink="/history" routerLinkActive="active">History</a>
+        <a routerLink="/premium" routerLinkActive="active">Premium</a>
+        <a routerLink="/profile" routerLinkActive="active">Profile</a>
+      </nav>
+
+      <div class="account">
+        @if (user.isPremium) {
+          <span class="badge badge-premium">Premium</span>
+        } @else {
+          <span class="badge badge-free">Free</span>
+        }
+        @if (user.avatarUrl) {
+          <img class="avatar" [src]="user.avatarUrl" [alt]="user.name" />
+        }
+        <span class="name">{{ user.name }}</span>
+        <button class="btn btn-outline logout-btn" (click)="logout()">Log out</button>
+      </div>
+    </div>
+  </header>
+}

@@ -1,0 +1,87 @@
+<div class="page-container">
+  <div class="page-head">
+    <div>
+      <h1>Workout History</h1>
+      <p>Every logged session and its predicted calorie burn.</p>
+    </div>
+    @if (limited()) {
+      <a class="btn btn-outline" href="#" (click)="$event.preventDefault()" title="Upgrade to export">
+        Export CSV 🔒
+      </a>
+    } @else {
+      <a class="btn btn-outline" [href]="exportUrl" target="_blank">Export CSV</a>
+    }
+  </div>
+
+  @if (limited()) {
+    <div class="upsell-banner">
+      Showing your last {{ limit() }} sessions on the Free plan.
+      <a routerLink="/premium">Upgrade to Premium</a> for unlimited history and CSV export.
+    </div>
+  }
+
+  <div class="card">
+    <div class="filter-bar">
+      <input
+        class="input search-input"
+        type="text"
+        placeholder="Search by date, duration, or calories..."
+        (input)="setSearch($any($event.target).value)"
+      />
+      <div class="gender-tabs">
+        <button
+          class="chip"
+          [class.active]="genderFilter() === 'all'"
+          (click)="setGenderFilter('all')"
+        >
+          All
+        </button>
+        <button
+          class="chip"
+          [class.active]="genderFilter() === 'male'"
+          (click)="setGenderFilter('male')"
+        >
+          Male
+        </button>
+        <button
+          class="chip"
+          [class.active]="genderFilter() === 'female'"
+          (click)="setGenderFilter('female')"
+        >
+          Female
+        </button>
+      </div>
+    </div>
+
+    @if (loading()) {
+      <p>Loading...</p>
+    } @else if (filtered().length === 0) {
+      <p class="empty">No sessions match your search.</p>
+    } @else {
+      <table class="activity-table">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Gender</th>
+            <th>Duration</th>
+            <th>Heart Rate</th>
+            <th>Body Temp</th>
+            <th>Calories Burnt</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (p of filtered(); track p._id) {
+            <tr>
+              <td>{{ p.createdAt | date: 'MMM d, y, h:mm a' }}</td>
+              <td class="capitalize">{{ p.gender }}</td>
+              <td>{{ p.duration }} min</td>
+              <td>{{ p.heartRate }} bpm</td>
+              <td>{{ p.bodyTemp }}°C</td>
+              <td class="calories">{{ p.caloriesBurnt }} kcal</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    }
+  </div>
+</div>

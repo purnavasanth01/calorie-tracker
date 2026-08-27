@@ -1,0 +1,42 @@
+<div class="page-container narrow">
+  <h1>Premium</h1>
+  <p>Unlock your full workout history and export it whenever you like.</p>
+
+  @if (verifying()) {
+    <div class="card status-card">Confirming your payment...</div>
+  } @else if (justUpgraded()) {
+    <div class="card status-card success">🎉 You're now on Premium. Enjoy unlimited history!</div>
+  }
+
+  <div class="plans">
+    <div class="card plan">
+      <span class="badge badge-free">Free</span>
+      <div class="price">$0</div>
+      <ul>
+        <li>Unlimited calorie predictions</li>
+        <li>Last 5 sessions in history</li>
+        <li>Weekly goal tracking</li>
+      </ul>
+    </div>
+
+    <div class="card plan featured">
+      <span class="badge badge-premium">Premium</span>
+      <div class="price">$4.99 <span>one-time</span></div>
+      <ul>
+        <li>Everything in Free</li>
+        <li>Unlimited history</li>
+        <li>CSV export</li>
+      </ul>
+
+      @if (auth.currentUser()?.isPremium) {
+        <button class="btn btn-outline" disabled>You already have Premium</button>
+      } @else {
+        <button class="btn btn-accent" (click)="upgrade()" [disabled]="redirecting()">
+          {{ redirecting() ? 'Redirecting to Stripe...' : 'Upgrade Now' }}
+        </button>
+      }
+    </div>
+  </div>
+
+  <p class="fine-print">Test mode: no real charge. Use card 4242 4242 4242 4242, any future date/CVC.</p>
+</div>

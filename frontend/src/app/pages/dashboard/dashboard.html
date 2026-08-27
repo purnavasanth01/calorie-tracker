@@ -1,0 +1,59 @@
+<div class="page-container">
+  <div class="page-head">
+    <div>
+      <h1>Welcome back{{ auth.currentUser()?.name ? ', ' + auth.currentUser()?.name!.split(' ')[0] : '' }} 👋</h1>
+      <p>Here's how your week is looking.</p>
+    </div>
+    <a class="btn btn-primary" routerLink="/predict">+ Log a Workout</a>
+  </div>
+
+  @if (summary(); as s) {
+    <div class="card goal-card">
+      <div class="goal-head">
+        <div>
+          <span class="goal-label">Weekly Goal Progress</span>
+          <h2>{{ s.weeklyTotal }} <span class="of">/ {{ s.weeklyGoal }} kcal</span></h2>
+        </div>
+        <div class="sessions-pill">{{ s.sessionsThisWeek }} sessions this week</div>
+      </div>
+      <div class="progress-track">
+        <div class="progress-fill" [style.width.%]="s.progressPercent"></div>
+      </div>
+      <span class="progress-percent">{{ s.progressPercent }}% of weekly goal</span>
+    </div>
+  }
+
+  <div class="card">
+    <div class="section-head">
+      <h3>Recent Activity</h3>
+      <a routerLink="/history">View all</a>
+    </div>
+
+    @if (loading()) {
+      <p>Loading...</p>
+    } @else if (recent().length === 0) {
+      <p class="empty">No workouts logged yet. Log your first one to see a prediction.</p>
+    } @else {
+      <table class="activity-table">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Duration</th>
+            <th>Heart Rate</th>
+            <th>Calories Burnt</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (p of recent(); track p._id) {
+            <tr>
+              <td>{{ p.createdAt | date: 'MMM d, y' }}</td>
+              <td>{{ p.duration }} min</td>
+              <td>{{ p.heartRate }} bpm</td>
+              <td class="calories">{{ p.caloriesBurnt }} kcal</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    }
+  </div>
+</div>

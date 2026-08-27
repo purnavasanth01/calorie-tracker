@@ -1,0 +1,44 @@
+<div class="page-container narrow">
+  <h1>Profile Settings</h1>
+  <p>Save your default stats so you don't have to re-enter them every time.</p>
+
+  <form class="card" [formGroup]="form" (ngSubmit)="submit()">
+    <div class="grid">
+      <div class="field">
+        <label class="field-label">Gender</label>
+        <select class="input" formControlName="gender">
+          <option value="male">Male</option>
+          <option value="female">Female</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label class="field-label">Age (years)</label>
+        <input class="input" type="number" formControlName="age" />
+      </div>
+
+      <div class="field">
+        <label class="field-label">Height (cm)</label>
+        <input class="input" type="number" formControlName="height" />
+      </div>
+
+      <div class="field">
+        <label class="field-label">Weight (kg)</label>
+        <input class="input" type="number" formControlName="weight" />
+      </div>
+
+      <div class="field span-2">
+        <label class="field-label">Weekly Calorie Burn Goal (kcal)</label>
+        <input class="input" type="number" formControlName="weeklyGoal" />
+      </div>
+    </div>
+
+    @if (saved()) {
+      <p class="saved-msg">Saved!</p>
+    }
+
+    <button class="btn btn-primary" type="submit" [disabled]="saving()">
+      {{ saving() ? 'Saving...' : 'Save Changes' }}
+    </button>
+  </form>
+</div>
