@@ -16,3 +16,5 @@ frontend/dist/
 .DS_Store
 Thumbs.db
 .vscode/
+backend/ml/model.joblib.bak
+PROJECT_CONTEXT.md
