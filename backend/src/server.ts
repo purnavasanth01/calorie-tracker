@@ -16,12 +16,19 @@ import paymentRoutes from "./routes/payment";
 import profileRoutes from "./routes/profile";
 
 const PORT = process.env.PORT || 5000;
+const isProduction = process.env.NODE_ENV === "production";
 
 async function main() {
   await connectDB();
   configurePassport();
 
   const app = express();
+
+  // On Render, requests arrive through a proxy that handles HTTPS. Trust it so
+  // Express knows the original request was HTTPS (needed for secure cookies).
+  if (isProduction) {
+    app.set("trust proxy", 1);
+  }
 
   app.use(
     cors({
@@ -44,6 +51,7 @@ async function main() {
         maxAge: 1000 * 60 * 60 * 24 * 7,
         httpOnly: true,
         sameSite: "lax",
+        secure: isProduction,
       },
     })
   );
