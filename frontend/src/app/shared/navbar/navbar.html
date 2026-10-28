@@ -20,9 +20,6 @@
         } @else {
           <span class="badge badge-free">Free</span>
         }
-        @if (user.avatarUrl) {
-          <img class="avatar" [src]="user.avatarUrl" [alt]="user.name" />
-        }
         <span class="name">{{ user.name }}</span>
         <button class="btn btn-outline logout-btn" (click)="logout()">Log out</button>
       </div>

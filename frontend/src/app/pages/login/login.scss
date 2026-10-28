@@ -18,18 +18,48 @@
   font-size: 2.2rem;
 }
 
-.google-btn {
+.tabs {
+  display: flex;
+  margin: 20px 0;
+  border-bottom: 1.5px solid var(--color-border);
+
+  button {
+    flex: 1;
+    padding: 10px;
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1.5px;
+    font-weight: 600;
+    color: var(--color-text-muted);
+    cursor: pointer;
+  }
+
+  button.active {
+    color: var(--color-primary);
+    border-bottom-color: var(--color-primary);
+  }
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 14px;
+  text-align: left;
+}
+
+.input-invalid {
+  border-color: var(--color-danger);
+}
+
+.hint,
+.error-msg {
+  color: var(--color-danger);
+  font-size: 0.8rem;
+  margin-top: 4px;
+}
+
+.submit-btn {
   width: 100%;
-  background: #1c2a27;
-  margin-top: 20px;
-}
-
-.google-btn:hover {
-  background: #0f1714;
-}
-
-.fine-print {
-  margin-top: 16px;
-  font-size: 0.78rem;
-  color: var(--color-text-muted);
+  margin-top: 6px;
 }

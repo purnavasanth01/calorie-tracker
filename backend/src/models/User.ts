@@ -9,10 +9,9 @@ export interface DefaultStats {
 
 export interface IUser extends Document {
   _id: Types.ObjectId;
-  googleId: string;
   email: string;
   name: string;
-  avatarUrl?: string;
+  passwordHash: string;
   isPremium: boolean;
   defaultStats: DefaultStats;
   weeklyGoal: number;
@@ -20,10 +19,9 @@ export interface IUser extends Document {
 }
 
 const userSchema = new Schema<IUser>({
-  googleId: { type: String, required: true, unique: true },
-  email: { type: String, required: true },
-  name: { type: String, required: true },
-  avatarUrl: { type: String },
+  email: { type: String, required: true, unique: true, lowercase: true, trim: true },
+  name: { type: String, required: true, trim: true },
+  passwordHash: { type: String, required: true, select: false },
   isPremium: { type: Boolean, default: false },
   defaultStats: {
     age: Number,
@@ -33,6 +31,10 @@ const userSchema = new Schema<IUser>({
   },
   weeklyGoal: { type: Number, default: 2000 },
   createdAt: { type: Date, default: Date.now },
+});
+
+userSchema.set("toJSON", {
+  transform: (_doc, { passwordHash, ...user }) => user,
 });
 
 export const User = model<IUser>("User", userSchema);
