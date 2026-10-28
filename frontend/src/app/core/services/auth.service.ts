@@ -11,8 +11,19 @@ export class AuthService {
 
   constructor(private http: HttpClient) {}
 
-  get googleLoginUrl(): string {
-    return `${environment.apiUrl}/auth/google`;
+  async login(email: string, password: string): Promise<void> {
+    await this.authenticate('login', { email, password });
+  }
+
+  async signup(name: string, email: string, password: string): Promise<void> {
+    await this.authenticate('signup', { name, email, password });
+  }
+
+  private async authenticate(path: 'login' | 'signup', body: object): Promise<void> {
+    const res = await firstValueFrom(
+      this.http.post<{ user: User }>(`${environment.apiUrl}/auth/${path}`, body)
+    );
+    this.currentUser.set(res.user);
   }
 
   async loadCurrentUser(): Promise<void> {

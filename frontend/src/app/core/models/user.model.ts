@@ -9,7 +9,6 @@ export interface User {
   _id: string;
   email: string;
   name: string;
-  avatarUrl?: string;
   isPremium: boolean;
   defaultStats: DefaultStats;
   weeklyGoal: number;
