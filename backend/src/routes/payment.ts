@@ -1,12 +1,12 @@
 import { Router } from "express";
-import { ensureAuth } from "../middleware/ensureAuth";
+import { asyncHandler } from "../middleware/asyncHandler";
 import { createCheckoutSession, verifyCheckoutSession, handleWebhook } from "../controllers/paymentController";
 
 const router = Router();
 
-router.post("/create-checkout-session", ensureAuth, createCheckoutSession);
-router.get("/verify/:sessionId", ensureAuth, verifyCheckoutSession);
+router.post("/create-checkout-session", asyncHandler(createCheckoutSession));
+router.get("/verify/:sessionId", asyncHandler(verifyCheckoutSession));
 
-export const webhookHandler = handleWebhook;
+export const webhookHandler = asyncHandler(handleWebhook);
 
 export default router;

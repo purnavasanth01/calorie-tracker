@@ -1,92 +1,73 @@
-.page-head {
+.upsell {
   display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 16px;
-  margin-bottom: 20px;
   flex-wrap: wrap;
-}
-
-.upsell-banner {
-  background: linear-gradient(135deg, #fff4e8, #ffe9d6);
-  border: 1px solid #ffd6a8;
-  border-radius: var(--radius-md);
-  padding: 12px 18px;
-  font-size: 0.88rem;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px 24px;
   margin-bottom: 20px;
+  padding: 16px 20px;
+  border: 1px solid rgba(184, 149, 90, 0.35);
+  border-radius: var(--radius-lg);
+  background: rgba(184, 149, 90, 0.08);
 
-  a {
-    font-weight: 700;
-    margin-left: 6px;
+  p {
+    margin: 0;
+    font-size: 0.92rem;
+    color: var(--color-ink);
+  }
+
+  strong {
+    font-weight: 600;
   }
 }
 
-.filter-bar {
+.filters {
   display: flex;
-  gap: 14px;
-  align-items: center;
-  margin-bottom: 18px;
   flex-wrap: wrap;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 24px;
 }
 
-.search-input {
+.search {
+  position: relative;
   flex: 1;
-  min-width: 220px;
+  min-width: 240px;
+
+  svg {
+    position: absolute;
+    top: 50%;
+    left: 14px;
+    width: 18px;
+    height: 18px;
+    transform: translateY(-50%);
+    fill: none;
+    stroke: var(--color-stone);
+    stroke-width: 1.6;
+    stroke-linecap: round;
+  }
+
+  .input {
+    padding-left: 42px;
+  }
 }
 
-.gender-tabs {
-  display: flex;
-  gap: 6px;
-}
-
-.chip {
-  border: 1.5px solid var(--color-border);
-  background: transparent;
-  border-radius: 999px;
-  padding: 7px 16px;
-  font-size: 0.82rem;
-  font-weight: 600;
-  color: var(--color-text-muted);
-  cursor: pointer;
-}
-
-.chip.active {
-  background: var(--color-primary);
-  border-color: var(--color-primary);
-  color: white;
-}
-
-.empty {
-  color: var(--color-text-muted);
-  padding: 12px 0;
-}
-
-.activity-table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-.activity-table th {
-  text-align: left;
-  font-size: 0.75rem;
-  text-transform: uppercase;
-  letter-spacing: 0.03em;
-  color: var(--color-text-muted);
-  padding: 8px 6px;
-  border-bottom: 1px solid var(--color-border);
-}
-
-.activity-table td {
-  padding: 10px 6px;
-  border-bottom: 1px solid var(--color-border);
-  font-size: 0.9rem;
+.time {
+  display: block;
+  margin-top: 2px;
+  font-size: 0.8rem;
 }
 
 .capitalize {
   text-transform: capitalize;
 }
 
-.activity-table .calories {
-  font-weight: 700;
-  color: var(--color-primary-dark);
+.no-match {
+  padding: 32px 0;
+  text-align: center;
+}
+
+.count {
+  margin: 16px 0 0;
+  font-size: 0.85rem;
 }

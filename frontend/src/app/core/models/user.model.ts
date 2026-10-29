@@ -1,8 +1,10 @@
+import { Gender } from './prediction.model';
+
 export interface DefaultStats {
   age?: number;
   height?: number;
   weight?: number;
-  gender?: 'male' | 'female';
+  gender?: Gender;
 }
 
 export interface User {
@@ -10,6 +12,7 @@ export interface User {
   email: string;
   name: string;
   isPremium: boolean;
+  isDemo?: boolean;
   defaultStats: DefaultStats;
   weeklyGoal: number;
 }

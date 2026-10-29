@@ -1,0 +1,150 @@
+:host {
+  display: block;
+}
+
+.how {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 104px clamp(20px, 5vw, 72px) 72px;
+}
+
+.section-intro {
+  max-width: 560px;
+  margin-bottom: 48px;
+
+  h2 {
+    font-size: clamp(2rem, 4vw, 2.75rem);
+  }
+}
+
+.steps {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 24px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.step {
+  padding: 32px;
+
+  h3 {
+    margin-bottom: 8px;
+    font-size: 1.5rem;
+  }
+
+  p {
+    margin: 0;
+  }
+}
+
+.numeral {
+  display: block;
+  margin-bottom: 10px;
+  font: 600 1.1rem var(--font-serif);
+  color: var(--color-gold-dark);
+}
+
+.step-visual {
+  display: grid;
+  place-items: center;
+  height: 140px;
+  margin-bottom: 28px;
+  border-radius: 12px;
+  background: var(--color-ivory);
+}
+
+.fields {
+  display: grid;
+  gap: 8px;
+  width: 75%;
+
+  span {
+    display: flex;
+    justify-content: space-between;
+    padding: 7px 12px;
+    border: 1px solid var(--color-line);
+    border-radius: 8px;
+    background: #fff;
+    font-size: 0.8rem;
+    font-weight: 500;
+    opacity: 0;
+    transform: translateX(-12px);
+    transition:
+      opacity 500ms var(--ease-out),
+      transform 500ms var(--ease-out);
+  }
+
+  span:nth-child(2) {
+    transition-delay: 150ms;
+  }
+
+  span:nth-child(3) {
+    transition-delay: 300ms;
+  }
+
+  em {
+    font-style: normal;
+    color: var(--color-stone);
+  }
+}
+
+.model {
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+  width: 75%;
+
+  .ecg {
+    width: 100%;
+    height: 40px;
+    --ecg-color: var(--color-forest);
+    --ecg-base: transparent;
+  }
+}
+
+.model-mark {
+  width: 40px;
+  height: 40px;
+}
+
+.mini-bars {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  align-items: end;
+  gap: 8px;
+  width: 70%;
+  height: 90px;
+
+  span {
+    min-height: 3px;
+    border-radius: 4px 4px 1px 1px;
+    background: var(--color-forest);
+    transform: scaleY(0);
+    transform-origin: bottom;
+    transition: transform 700ms var(--ease-out);
+    transition-delay: calc(var(--i) * 70ms);
+  }
+
+  span:last-child {
+    background: var(--color-gold);
+  }
+}
+
+.in-view {
+  .fields span {
+    opacity: 1;
+    transform: none;
+  }
+
+  .mini-bars span {
+    transform: none;
+  }
+}
+
+@media (max-width: 960px) {
+  .steps {
+    grid-template-columns: 1fr;
+  }
+}

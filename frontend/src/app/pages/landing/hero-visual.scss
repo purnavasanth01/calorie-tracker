@@ -1,0 +1,141 @@
+.stage {
+  position: relative;
+  height: 480px;
+}
+
+.halo {
+  position: absolute;
+  inset: 50% auto auto 50%;
+  width: 400px;
+  height: 400px;
+  margin: -200px 0 0 -200px;
+  border: 1px solid rgba(184, 149, 90, 0.3);
+  border-radius: 50%;
+}
+
+.orb {
+  position: absolute;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, rgba(244, 239, 230, 0.3), rgba(184, 149, 90, 0.14) 55%, transparent 72%);
+}
+
+.orb-large {
+  top: 2%;
+  right: 4%;
+  width: 190px;
+  height: 190px;
+}
+
+.orb-small {
+  bottom: 4%;
+  left: 2%;
+  width: 120px;
+  height: 120px;
+}
+
+.label {
+  margin: 0;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.result-card {
+  position: absolute;
+  top: 16%;
+  left: 6%;
+  width: 300px;
+  padding: 26px;
+  border-radius: var(--radius-lg);
+  background: var(--color-ivory);
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.35);
+  color: var(--color-ink);
+
+  .label {
+    color: var(--color-gold-dark);
+  }
+}
+
+.value {
+  margin: 10px 0 4px;
+  font-size: 3.6rem;
+  color: var(--color-ink);
+}
+
+.ecg {
+  height: 48px;
+  --ecg-color: var(--color-forest);
+  --ecg-base: var(--color-line);
+}
+
+.meta {
+  margin: 6px 0 0;
+  font-size: 0.8rem;
+}
+
+.goal-card {
+  position: absolute;
+  right: 2%;
+  bottom: 12%;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 18px 22px;
+  border: 1px solid rgba(184, 149, 90, 0.35);
+  border-radius: var(--radius-lg);
+  background: rgba(21, 42, 32, 0.92);
+  box-shadow: 0 24px 50px rgba(0, 0, 0, 0.35);
+  color: var(--color-cream);
+
+  .label {
+    color: rgba(244, 239, 230, 0.65);
+  }
+}
+
+.goal-value {
+  margin: 0;
+  font-size: 1.9rem;
+  color: var(--color-cream);
+}
+
+.mini-ring {
+  width: 56px;
+  height: 56px;
+  --ring-width: 10;
+  --ring-delay: 0.8s;
+}
+
+@media (max-width: 960px) {
+  .stage {
+    height: 400px;
+    max-width: 460px;
+    margin: 0 auto;
+  }
+
+  .halo {
+    width: 320px;
+    height: 320px;
+    margin: -160px 0 0 -160px;
+  }
+}
+
+@media (max-width: 480px) {
+  .stage {
+    height: 360px;
+  }
+
+  .result-card {
+    left: 0;
+    width: 260px;
+    padding: 20px;
+  }
+
+  .value {
+    font-size: 3rem;
+  }
+
+  .goal-card {
+    right: 0;
+  }
+}

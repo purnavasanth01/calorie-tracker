@@ -1,59 +1,130 @@
 <div class="page-container">
-  <div class="page-head">
+  <header class="page-head reveal">
     <div>
-      <h1>Welcome back{{ auth.currentUser()?.name ? ', ' + auth.currentUser()?.name!.split(' ')[0] : '' }} 👋</h1>
-      <p>Here's how your week is looking.</p>
+      <p class="eyebrow">{{ today | date: 'EEEE, d MMMM' }}</p>
+      <h1>{{ greeting }}, {{ firstName() }}</h1>
+      <p>Here's how your week is shaping up.</p>
     </div>
-    <a class="btn btn-primary" routerLink="/predict">+ Log a Workout</a>
-  </div>
+    <a class="btn btn-primary" routerLink="/predict">Log a workout</a>
+  </header>
 
-  @if (summary(); as s) {
-    <div class="card goal-card">
-      <div class="goal-head">
-        <div>
-          <span class="goal-label">Weekly Goal Progress</span>
-          <h2>{{ s.weeklyTotal }} <span class="of">/ {{ s.weeklyGoal }} kcal</span></h2>
-        </div>
-        <div class="sessions-pill">{{ s.sessionsThisWeek }} sessions this week</div>
-      </div>
-      <div class="progress-track">
-        <div class="progress-fill" [style.width.%]="s.progressPercent"></div>
-      </div>
-      <span class="progress-percent">{{ s.progressPercent }}% of weekly goal</span>
-    </div>
+  @if (error()) {
+    <p class="alert" role="alert">We couldn't load your dashboard. Please refresh the page.</p>
   }
 
-  <div class="card">
+  @if (summary(); as s) {
+    <section class="stats" aria-label="Last 7 days">
+      <div class="card card-dark card-link goal reveal" style="--i: 1">
+        <div class="goal-body">
+          <div>
+            <p class="eyebrow">
+              Last 7 days
+              <span
+                class="info"
+                tabindex="0"
+                role="img"
+                aria-label="Today plus the 6 days before it, in your time zone."
+                data-tip="Today plus the 6 days before it, in your time zone."
+                >i</span
+              >
+            </p>
+            <p class="stat-value figure"><span [appCountUp]="s.weeklyTotal"></span><span class="unit">kcal</span></p>
+            <p>burned of your {{ s.weeklyGoal | number }} kcal weekly goal</p>
+          </div>
+
+          <app-progress-ring
+            class="ring"
+            [percent]="s.progressPercent"
+            [class.done]="s.progressPercent >= 100"
+            role="progressbar"
+            aria-label="Weekly goal progress"
+            aria-valuemin="0"
+            aria-valuemax="100"
+            [attr.aria-valuenow]="s.progressPercent"
+          >
+            <span class="figure" aria-hidden="true"><span [appCountUp]="s.progressPercent"></span>%</span>
+          </app-progress-ring>
+        </div>
+        <a class="card-cue" routerLink="/profile">Adjust goal <span aria-hidden="true">→</span></a>
+      </div>
+
+      <div class="card card-link stat reveal" style="--i: 2">
+        <p class="eyebrow">Sessions</p>
+        <p class="stat-value figure"><span [appCountUp]="s.sessionsThisWeek"></span></p>
+        <p>logged in the last 7 days</p>
+        <a class="card-cue" routerLink="/history">View history <span aria-hidden="true">→</span></a>
+      </div>
+
+      <div class="card card-link stat reveal" style="--i: 3">
+        <p class="eyebrow">To go</p>
+        @if (remaining() > 0) {
+          <p class="stat-value figure"><span [appCountUp]="remaining()"></span><span class="unit">kcal</span></p>
+          <p>left to reach your goal</p>
+        } @else {
+          <p class="stat-value figure">Done</p>
+          <p>Goal reached. Well done.</p>
+        }
+        <a class="card-cue" routerLink="/predict">Log a workout <span aria-hidden="true">→</span></a>
+      </div>
+    </section>
+
+    <section class="card chart-card reveal" style="--i: 4" aria-label="Calories burned per day this week">
+      <div class="section-head">
+        <h2>This week</h2>
+      </div>
+      <app-week-chart [days]="s.daily" [weeklyGoal]="s.weeklyGoal" />
+    </section>
+  } @else if (!error()) {
+    <section class="stats" aria-hidden="true">
+      @for (i of [1, 2, 3]; track i) {
+        <div class="card stat-skeleton" [class.goal]="i === 1">
+          <span class="skeleton" style="width: 40%; height: 12px"></span>
+          <span class="skeleton" style="width: 55%; height: 44px"></span>
+          <span class="skeleton" style="width: 80%; height: 12px"></span>
+        </div>
+      }
+    </section>
+  }
+
+  <section class="card reveal" style="--i: 5">
     <div class="section-head">
-      <h3>Recent Activity</h3>
-      <a routerLink="/history">View all</a>
+      <h2>Recent activity</h2>
+      @if (recent().length) {
+        <a routerLink="/history">View all</a>
+      }
     </div>
 
     @if (loading()) {
-      <p>Loading...</p>
-    } @else if (recent().length === 0) {
-      <p class="empty">No workouts logged yet. Log your first one to see a prediction.</p>
-    } @else {
-      <table class="activity-table">
-        <thead>
-          <tr>
-            <th>Date</th>
-            <th>Duration</th>
-            <th>Heart Rate</th>
-            <th>Calories Burnt</th>
-          </tr>
-        </thead>
-        <tbody>
-          @for (p of recent(); track p._id) {
+      <div class="rows-skeleton" aria-label="Loading" role="status">
+        @for (i of [1, 2, 3, 4]; track i) {
+          <span class="skeleton"></span>
+        }
+      </div>
+    } @else if (recent().length) {
+      <div class="table-scroll">
+        <table class="data-table">
+          <thead>
             <tr>
-              <td>{{ p.createdAt | date: 'MMM d, y' }}</td>
-              <td>{{ p.duration }} min</td>
-              <td>{{ p.heartRate }} bpm</td>
-              <td class="calories">{{ p.caloriesBurnt }} kcal</td>
+              <th scope="col">Date</th>
+              <th scope="col" class="num">Duration</th>
+              <th scope="col" class="num hide-sm">Heart rate</th>
+              <th scope="col" class="num">Calories</th>
             </tr>
-          }
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            @for (p of recent(); track p._id) {
+              <tr>
+                <td>{{ p.createdAt | date: 'EEE, MMM d' }}</td>
+                <td class="num">{{ p.duration | number: '1.0-1' }} min</td>
+                <td class="num hide-sm">{{ p.heartRate | number: '1.0-0' }} bpm</td>
+                <td class="num kcal">{{ p.caloriesBurnt | number: '1.0-0' }} kcal</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    } @else if (!error()) {
+      <app-empty-state message="Log your first session to see your estimated calorie burn here." />
     }
-  </div>
+  </section>
 </div>

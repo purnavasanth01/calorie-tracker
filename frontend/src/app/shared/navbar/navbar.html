@@ -1,27 +1,24 @@
 @if (auth.currentUser(); as user) {
-  <header class="navbar">
+  <header class="navbar" [class.scrolled]="scrolled()">
     <div class="navbar-inner">
-      <a class="brand" routerLink="/dashboard">
-        <span class="brand-mark">🔥</span>
+      <a class="wordmark" routerLink="/dashboard">
+        <app-logo class="mark" />
         CalTrack
       </a>
 
-      <nav class="tabs">
-        <a routerLink="/dashboard" routerLinkActive="active">Dashboard</a>
-        <a routerLink="/predict" routerLinkActive="active">Log Workout</a>
-        <a routerLink="/history" routerLinkActive="active">History</a>
-        <a routerLink="/premium" routerLinkActive="active">Premium</a>
-        <a routerLink="/profile" routerLinkActive="active">Profile</a>
+      <nav class="links" aria-label="Main">
+        <a routerLink="/dashboard" routerLinkActive="active" ariaCurrentWhenActive="page">Dashboard</a>
+        <a routerLink="/predict" routerLinkActive="active" ariaCurrentWhenActive="page">Log workout</a>
+        <a routerLink="/history" routerLinkActive="active" ariaCurrentWhenActive="page">History</a>
+        <a routerLink="/premium" routerLinkActive="active" ariaCurrentWhenActive="page">Premium</a>
+        <a routerLink="/profile" routerLinkActive="active" ariaCurrentWhenActive="page">Profile</a>
       </nav>
 
       <div class="account">
-        @if (user.isPremium) {
-          <span class="badge badge-premium">Premium</span>
-        } @else {
-          <span class="badge badge-free">Free</span>
-        }
-        <span class="name">{{ user.name }}</span>
-        <button class="btn btn-outline logout-btn" (click)="logout()">Log out</button>
+        <app-plan-badge [user]="user" />
+        <span class="avatar" aria-hidden="true">{{ user.name.charAt(0) }}</span>
+        <span class="name" [attr.title]="user.name">{{ user.name }}</span>
+        <button class="logout" type="button" (click)="logout()">Log out</button>
       </div>
     </div>
   </header>

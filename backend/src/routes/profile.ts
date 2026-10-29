@@ -1,9 +1,9 @@
 import { Router } from "express";
-import { ensureAuth } from "../middleware/ensureAuth";
+import { asyncHandler } from "../middleware/asyncHandler";
 import { updateProfile } from "../controllers/profileController";
 
 const router = Router();
 
-router.put("/", ensureAuth, updateProfile);
+router.put("/", asyncHandler(updateProfile));
 
 export default router;

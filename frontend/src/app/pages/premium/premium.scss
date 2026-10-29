@@ -1,19 +1,3 @@
-.narrow {
-  max-width: 720px;
-}
-
-.status-card {
-  margin-bottom: 20px;
-  text-align: center;
-  font-weight: 600;
-}
-
-.status-card.success {
-  background: #ecfdf3;
-  border-color: #86efac;
-  color: #166534;
-}
-
 .plans {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -23,48 +7,104 @@
 .plan {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
-  gap: 12px;
-}
+  padding: 32px;
 
-.plan.featured {
-  border: 2px solid var(--color-accent);
-  position: relative;
-}
+  h2 {
+    margin: 0;
+  }
 
-.price {
-  font-size: 2rem;
-  font-weight: 800;
+  .price {
+    margin: 20px 0 0;
+    font-size: 3.25rem;
+    color: var(--color-ink);
+  }
 
-  span {
+  &.card-dark .price {
+    color: var(--color-cream);
+  }
+
+  .price-note {
+    margin: 8px 0 24px;
     font-size: 0.9rem;
-    font-weight: 500;
-    color: var(--color-text-muted);
   }
 }
 
-.plan ul {
-  margin: 0;
-  padding-left: 18px;
-  color: var(--color-text-muted);
-  font-size: 0.9rem;
+.plan-title {
   display: flex;
-  flex-direction: column;
-  gap: 6px;
+  align-items: center;
+  justify-content: space-between;
 }
 
-.plan button {
-  width: 100%;
+.badge-dark {
+  border: 1px solid rgba(184, 149, 90, 0.5);
+  color: var(--color-cream);
+}
+
+.perks {
+  display: grid;
+  gap: 12px;
+  margin: 0 0 28px;
+  padding: 24px 0 0;
+  border-top: 1px solid var(--color-line);
+  list-style: none;
+
+  li {
+    position: relative;
+    padding-left: 26px;
+    font-size: 0.92rem;
+  }
+
+  li::before {
+    content: '';
+    position: absolute;
+    top: 3px;
+    left: 4px;
+    width: 5px;
+    height: 10px;
+    border: solid var(--color-gold-dark);
+    border-width: 0 1.5px 1.5px 0;
+    transform: rotate(45deg);
+  }
+}
+
+.card-dark .perks {
+  border-color: rgba(244, 239, 230, 0.15);
+
+  li::before {
+    border-color: var(--color-gold);
+  }
+}
+
+.current,
+.plan .btn {
   margin-top: auto;
 }
 
+.current {
+  margin-bottom: 0;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--color-forest);
+}
+
+.card-dark .current {
+  color: var(--color-gold);
+}
+
+.alert-neutral {
+  border-color: var(--color-stone);
+  background: var(--color-cream);
+  color: var(--color-ink);
+}
+
 .fine-print {
-  margin-top: 20px;
-  font-size: 0.78rem;
+  margin-top: 24px;
+  text-wrap: balance;
+  font-size: 0.8rem;
   text-align: center;
 }
 
-@media (max-width: 620px) {
+@media (max-width: 680px) {
   .plans {
     grid-template-columns: 1fr;
   }

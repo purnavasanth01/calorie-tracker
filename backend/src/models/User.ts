@@ -13,6 +13,7 @@ export interface IUser extends Document {
   name: string;
   passwordHash: string;
   isPremium: boolean;
+  isDemo: boolean;
   defaultStats: DefaultStats;
   weeklyGoal: number;
   createdAt: Date;
@@ -23,6 +24,7 @@ const userSchema = new Schema<IUser>({
   name: { type: String, required: true, trim: true },
   passwordHash: { type: String, required: true, select: false },
   isPremium: { type: Boolean, default: false },
+  isDemo: { type: Boolean, default: false },
   defaultStats: {
     age: Number,
     height: Number,

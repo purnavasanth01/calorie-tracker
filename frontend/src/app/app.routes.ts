@@ -1,10 +1,17 @@
 import { Routes } from '@angular/router';
 import { authGuard } from './core/guards/auth.guard';
+import { guestGuard } from './core/guards/guest.guard';
 
 export const routes: Routes = [
-  { path: '', pathMatch: 'full', redirectTo: 'dashboard' },
+  {
+    path: '',
+    pathMatch: 'full',
+    canActivate: [guestGuard],
+    loadComponent: () => import('./pages/landing/landing').then((m) => m.Landing),
+  },
   {
     path: 'login',
+    canActivate: [guestGuard],
     loadComponent: () => import('./pages/login/login').then((m) => m.Login),
   },
   {
@@ -32,5 +39,5 @@ export const routes: Routes = [
     canActivate: [authGuard],
     loadComponent: () => import('./pages/profile/profile').then((m) => m.Profile),
   },
-  { path: '**', redirectTo: 'dashboard' },
+  { path: '**', redirectTo: '' },
 ];

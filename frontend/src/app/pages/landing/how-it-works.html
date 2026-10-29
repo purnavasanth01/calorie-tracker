@@ -1,0 +1,40 @@
+<section class="how">
+  <div class="section-intro scroll-reveal" appInView>
+    <p class="eyebrow">How it works</p>
+    <h2>Three steps, a few seconds.</h2>
+  </div>
+
+  <ol class="steps">
+    @for (step of steps; track step.title) {
+      <li class="step card scroll-reveal" appInView [style.--i]="$index">
+        <div class="step-visual" aria-hidden="true">
+          @switch ($index) {
+            @case (0) {
+              <div class="fields">
+                <span><em>Duration</em>28 min</span>
+                <span><em>Heart rate</em>112 bpm</span>
+                <span><em>Body temp</em>40.4 °C</span>
+              </div>
+            }
+            @case (1) {
+              <div class="model">
+                <app-logo class="model-mark" [pulse]="true" />
+                <app-ecg class="ecg" />
+              </div>
+            }
+            @case (2) {
+              <div class="mini-bars">
+                @for (height of [45, 70, 30, 85, 0, 55, 95]; track $index) {
+                  <span [style.height.%]="height" [style.--i]="$index"></span>
+                }
+              </div>
+            }
+          }
+        </div>
+        <span class="numeral">{{ step.numeral }}</span>
+        <h3>{{ step.title }}</h3>
+        <p>{{ step.text }}</p>
+      </li>
+    }
+  </ol>
+</section>

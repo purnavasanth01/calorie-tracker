@@ -38,7 +38,8 @@ def main():
     }])
 
     prediction = model.predict(row)[0]
-    print(json.dumps({"calories": round(float(prediction), 2)}))
+    calories = max(0.0, float(prediction))
+    print(json.dumps({"calories": round(calories, 2)}))
 
 
 if __name__ == "__main__":
