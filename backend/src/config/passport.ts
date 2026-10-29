@@ -2,11 +2,16 @@ import passport from "passport";
 import { Strategy as LocalStrategy } from "passport-local";
 import bcrypt from "bcryptjs";
 import { User } from "../models/User";
+import { isPasswordTooLong } from "../validation/account";
 
 export function configurePassport(): void {
   passport.use(
     new LocalStrategy({ usernameField: "email" }, async (email, password, done) => {
       try {
+        if (isPasswordTooLong(password)) {
+          done(null, false);
+          return;
+        }
         const user = await User.findOne({ email: email.toLowerCase() }).select("+passwordHash");
         const isValid = user !== null && (await bcrypt.compare(password, user.passwordHash));
         done(null, isValid ? user : false);

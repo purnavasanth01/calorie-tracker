@@ -1,0 +1,40 @@
+<figure class="chart">
+  <p class="legend" aria-hidden="true"><span class="swatch"></span>Daily target · {{ dailyTarget() | number: '1.0-0' }} kcal</p>
+
+  <div class="plot" aria-hidden="true">
+    <div class="target" [style.bottom.%]="targetPercent()"></div>
+    @for (bar of bars(); track bar.date) {
+      <div class="column" [class.today]="bar.isToday">
+        <div class="bar" [style.height.%]="bar.heightPercent" [style.--i]="$index" [attr.title]="bar.fullLabel">
+          @if (bar.calories > 0) {
+            <span class="value">{{ bar.calories | number: '1.0-0' }}</span>
+          }
+        </div>
+      </div>
+    }
+  </div>
+
+  <div class="labels" aria-hidden="true">
+    @for (bar of bars(); track bar.date) {
+      <span [class.today]="bar.isToday">{{ bar.isToday ? 'Today' : bar.shortLabel }}</span>
+    }
+  </div>
+
+  <div class="sr-only">
+    <table>
+      <caption>
+        Calories burned per day, last 7 days. Daily target
+        {{ dailyTarget() | number: '1.0-0' }}
+        kcal.
+      </caption>
+      <tbody>
+        @for (bar of bars(); track bar.date) {
+          <tr>
+            <th scope="row">{{ bar.fullLabel }}</th>
+            <td>{{ bar.calories | number: '1.0-0' }} kcal</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</figure>

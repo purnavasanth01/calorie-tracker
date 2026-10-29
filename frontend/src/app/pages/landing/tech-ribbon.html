@@ -1,0 +1,11 @@
+<section class="ribbon" aria-label="Built with">
+  <div class="track">
+    @for (copy of [0, 1]; track copy) {
+      <ul [attr.aria-hidden]="copy === 1 ? 'true' : null">
+        @for (tech of techStack; track tech) {
+          <li>{{ tech }}</li>
+        }
+      </ul>
+    }
+  </div>
+</section>

@@ -1,5 +1,7 @@
+export type Gender = 'male' | 'female';
+
 export interface PredictionInput {
-  gender: 'male' | 'female';
+  gender: Gender;
   age: number;
   height: number;
   weight: number;
@@ -14,9 +16,15 @@ export interface Prediction extends PredictionInput {
   createdAt: string;
 }
 
+export interface DailyTotal {
+  date: string;
+  calories: number;
+}
+
 export interface DashboardSummary {
   weeklyTotal: number;
   weeklyGoal: number;
   progressPercent: number;
   sessionsThisWeek: number;
+  daily: DailyTotal[];
 }

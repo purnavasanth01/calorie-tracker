@@ -1,44 +1,54 @@
 <div class="page-container narrow">
-  <h1>Profile Settings</h1>
-  <p>Save your default stats so you don't have to re-enter them every time.</p>
-
-  <form class="card" [formGroup]="form" (ngSubmit)="submit()">
-    <div class="grid">
-      <div class="field">
-        <label class="field-label">Gender</label>
-        <select class="input" formControlName="gender">
-          <option value="male">Male</option>
-          <option value="female">Female</option>
-        </select>
-      </div>
-
-      <div class="field">
-        <label class="field-label">Age (years)</label>
-        <input class="input" type="number" formControlName="age" />
-      </div>
-
-      <div class="field">
-        <label class="field-label">Height (cm)</label>
-        <input class="input" type="number" formControlName="height" />
-      </div>
-
-      <div class="field">
-        <label class="field-label">Weight (kg)</label>
-        <input class="input" type="number" formControlName="weight" />
-      </div>
-
-      <div class="field span-2">
-        <label class="field-label">Weekly Calorie Burn Goal (kcal)</label>
-        <input class="input" type="number" formControlName="weeklyGoal" />
-      </div>
+  <header class="page-head reveal">
+    <div>
+      <p class="eyebrow">Settings</p>
+      <h1>Your profile</h1>
+      <p>Save your usual stats so logging a workout takes seconds.</p>
     </div>
+  </header>
 
-    @if (saved()) {
-      <p class="saved-msg">Saved!</p>
+  <form class="card reveal" style="--i: 1" [formGroup]="form" (ngSubmit)="submit()">
+    @if (auth.currentUser(); as user) {
+      <section class="account" aria-label="Account">
+        <span class="avatar" aria-hidden="true">{{ user.name.charAt(0) }}</span>
+        <div>
+          <p class="account-name">{{ user.name }}</p>
+          <p class="muted">{{ user.email }}</p>
+        </div>
+        <app-plan-badge [user]="user" />
+      </section>
     }
 
-    <button class="btn btn-primary" type="submit" [disabled]="saving()">
-      {{ saving() ? 'Saving...' : 'Save Changes' }}
-    </button>
+    <fieldset class="form-section">
+      <legend>Default stats</legend>
+      <p>Used to pre-fill the workout form. Leave any of them blank if you prefer.</p>
+      <div class="form-grid">
+        <app-gender-toggle [control]="form.controls.gender" />
+        @for (field of statFields; track field) {
+          <app-number-input [field]="field" [control]="form.controls[field]" />
+        }
+      </div>
+    </fieldset>
+
+    <fieldset class="form-section">
+      <legend>Weekly goal</legend>
+      <p>How many calories you aim to burn across a week of training.</p>
+      <div class="form-grid">
+        <app-number-input field="weeklyGoal" [control]="form.controls.weeklyGoal" />
+      </div>
+    </fieldset>
+
+    @if (error()) {
+      <p class="alert" role="alert">{{ error() }}</p>
+    }
+
+    <div class="actions">
+      <button class="btn btn-primary" type="submit" [disabled]="saving() || form.pristine">
+        {{ saving() ? 'Saving…' : 'Save changes' }}
+      </button>
+      @if (saved() && form.pristine) {
+        <p class="saved" role="status">Changes saved</p>
+      }
+    </div>
   </form>
 </div>

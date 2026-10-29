@@ -1,59 +1,143 @@
-<div class="login-shell">
-  <div class="login-card card">
-    <span class="mark">🔥</span>
-    <h1>CalTrack</h1>
-    <p>Log your workouts, predict calories burnt in real time, and track your weekly progress.</p>
+<main class="auth">
+  <section class="brand">
+    <a class="wordmark reveal" routerLink="/">
+      <app-logo class="mark" [draw]="true" />
+      CalTrack
+    </a>
 
-    <div class="tabs">
-      <button type="button" [class.active]="mode() === 'login'" (click)="setMode('login')">Log in</button>
-      <button type="button" [class.active]="mode() === 'signup'" (click)="setMode('signup')">Sign up</button>
+    <div class="pitch reveal" style="--i: 1">
+      <p class="eyebrow">Calorie intelligence</p>
+      <h1>Know what every workout is worth.</h1>
+      <p class="lede">
+        Log a session and a machine-learning model estimates the calories you burned, from your heart
+        rate, duration and body temperature.
+      </p>
     </div>
 
-    <form [formGroup]="form" (ngSubmit)="submit()">
-      @if (mode() === 'signup') {
+    <ol class="features reveal" style="--i: 2">
+      <li>
+        <span class="numeral" aria-hidden="true">I</span>
+        <div>
+          <strong>Precise predictions</strong>
+          <p>Trained on 15,000 workouts, accurate to about 1.5 kcal.</p>
+        </div>
+      </li>
+      <li>
+        <span class="numeral" aria-hidden="true">II</span>
+        <div>
+          <strong>Weekly goals</strong>
+          <p>Set a target and watch your progress build through the week.</p>
+        </div>
+      </li>
+      <li>
+        <span class="numeral" aria-hidden="true">III</span>
+        <div>
+          <strong>Your full history</strong>
+          <p>Every session in one place, searchable at a glance.</p>
+        </div>
+      </li>
+    </ol>
+  </section>
+
+  <section class="panel">
+    <div class="form-wrap reveal" style="--i: 1">
+      <h2>{{ mode() === 'signup' ? 'Create your account' : 'Welcome back' }}</h2>
+      <p class="subtitle">
+        {{ mode() === 'signup' ? 'Start tracking in under a minute.' : 'Log in to continue where you left off.' }}
+      </p>
+
+      <div class="segmented switch" role="group" aria-label="Log in or sign up">
+        <button type="button" [attr.aria-pressed]="mode() === 'login'" (click)="setMode('login')">Log in</button>
+        <button type="button" [attr.aria-pressed]="mode() === 'signup'" (click)="setMode('signup')">Sign up</button>
+      </div>
+
+      <form [formGroup]="form" (ngSubmit)="submit()">
+        @if (mode() === 'signup') {
+          <div class="field">
+            <label class="field-label" for="name">Full name</label>
+            <input
+              class="input"
+              id="name"
+              formControlName="name"
+              autocomplete="name"
+              [attr.aria-invalid]="isInvalid('name')"
+              [attr.aria-describedby]="isInvalid('name') ? 'name-hint' : null"
+            />
+            @if (isInvalid('name')) {
+              <span id="name-hint" class="hint is-error">Please enter your name (up to {{ maxNameLength }} characters).</span>
+            }
+          </div>
+        }
+
         <div class="field">
-          <label class="field-label" for="name">Name</label>
-          <input id="name" class="input" formControlName="name" autocomplete="name" [class.input-invalid]="isInvalid('name')" />
-          @if (isInvalid('name')) {
-            <span class="hint">Please enter your name.</span>
+          <label class="field-label" for="email">Email</label>
+          <input
+            class="input"
+            id="email"
+            type="email"
+            formControlName="email"
+            autocomplete="email"
+            inputmode="email"
+            placeholder="you@example.com"
+            spellcheck="false"
+            [attr.aria-invalid]="isInvalid('email')"
+            [attr.aria-describedby]="isInvalid('email') ? 'email-hint' : null"
+          />
+          @if (isInvalid('email')) {
+            <span id="email-hint" class="hint is-error">Please enter a valid email address.</span>
           }
         </div>
-      }
 
-      <div class="field">
-        <label class="field-label" for="email">Email</label>
-        <input id="email" class="input" type="email" formControlName="email" autocomplete="email" [class.input-invalid]="isInvalid('email')" />
-        @if (isInvalid('email')) {
-          <span class="hint">Please enter a valid email.</span>
+        <div class="field">
+          <label class="field-label" for="password">Password</label>
+          <div class="password">
+            <input
+              class="input"
+              id="password"
+              [type]="showPassword() ? 'text' : 'password'"
+              formControlName="password"
+              [autocomplete]="mode() === 'signup' ? 'new-password' : 'current-password'"
+              [attr.aria-invalid]="isInvalid('password')"
+              [attr.aria-describedby]="mode() === 'signup' || isInvalid('password') ? 'password-hint' : null"
+            />
+            <button
+              type="button"
+              class="toggle-visibility"
+              [attr.aria-pressed]="showPassword()"
+              aria-controls="password"
+              (click)="showPassword.set(!showPassword())"
+            >
+              {{ showPassword() ? 'Hide' : 'Show' }}
+            </button>
+          </div>
+          @if (mode() === 'signup') {
+            <span id="password-hint" class="hint" [class.is-error]="isInvalid('password')">
+              Use {{ minPasswordLength }} to {{ maxPasswordLength }} characters.
+            </span>
+          } @else if (isInvalid('password')) {
+            <span id="password-hint" class="hint is-error">Please enter your password.</span>
+          }
+        </div>
+
+        @if (error()) {
+          <p class="alert" role="alert">{{ error() }}</p>
         }
-      </div>
 
-      <div class="field">
-        <label class="field-label" for="password">Password</label>
-        <input
-          id="password"
-          class="input"
-          type="password"
-          formControlName="password"
-          [autocomplete]="mode() === 'signup' ? 'new-password' : 'current-password'"
-          [class.input-invalid]="isInvalid('password')"
-        />
-        @if (isInvalid('password')) {
-          <span class="hint">Password must be at least 8 characters.</span>
-        }
-      </div>
+        <button class="btn btn-primary btn-block submit" type="submit" [disabled]="submitting()" [attr.aria-busy]="submitting()">
+          @if (submitting()) {
+            <span class="spinner" aria-hidden="true"></span>
+            {{ mode() === 'signup' ? 'Creating account…' : 'Logging in…' }}
+          } @else {
+            {{ mode() === 'signup' ? 'Create account' : 'Log in' }}
+          }
+        </button>
+      </form>
 
-      @if (error()) {
-        <p class="error-msg">{{ error() }}</p>
-      }
-
-      <button class="btn btn-primary submit-btn" type="submit" [disabled]="submitting()">
-        @if (submitting()) {
-          Please wait...
-        } @else {
-          {{ mode() === 'signup' ? 'Create account' : 'Log in' }}
-        }
-      </button>
-    </form>
-  </div>
-</div>
+      <p class="fine-print">Passwords are securely hashed and never stored in plain text.</p>
+      <p class="demo-prompt">
+        Just looking?
+        <button type="button" (click)="tryDemo()" [disabled]="submitting()">Explore the demo</button>
+      </p>
+    </div>
+  </section>
+</main>

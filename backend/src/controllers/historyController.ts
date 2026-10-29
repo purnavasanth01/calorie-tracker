@@ -47,23 +47,43 @@ export async function exportHistory(req: Request, res: Response): Promise<void> 
   res.send(header + rows);
 }
 
+const SUMMARY_DAYS = 7;
+const DAY_MS = 24 * 60 * 60 * 1000;
+const MAX_TZ_OFFSET_MINUTES = 14 * 60;
+
+const round1 = (n: number) => Math.round(n * 10) / 10;
+
+function localDay(date: Date, tzOffset: number): string {
+  return new Date(date.getTime() - tzOffset * 60_000).toISOString().slice(0, 10);
+}
+
 export async function getDashboardSummary(req: Request, res: Response): Promise<void> {
   const user = req.user!;
+  const tz = Number(req.query.tz);
+  const tzOffset = Number.isFinite(tz) && Math.abs(tz) <= MAX_TZ_OFFSET_MINUTES ? tz : 0;
 
-  const oneWeekAgo = new Date();
-  oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+  const today = localDay(new Date(), tzOffset);
+  const days = Array.from({ length: SUMMARY_DAYS }, (_, i) =>
+    new Date(Date.parse(today) - (SUMMARY_DAYS - 1 - i) * DAY_MS).toISOString().slice(0, 10)
+  );
+  const windowStart = new Date(Date.parse(days[0]) + tzOffset * 60_000);
 
-  const recent = await Prediction.find({
-    user: user._id,
-    createdAt: { $gte: oneWeekAgo },
-  });
+  const recent = await Prediction.find({ user: user._id, createdAt: { $gte: windowStart } });
 
-  const weeklyTotal = recent.reduce((sum, p) => sum + p.caloriesBurnt, 0);
+  const totals = new Map(days.map((day) => [day, 0]));
+  for (const p of recent) {
+    const day = localDay(p.createdAt, tzOffset);
+    totals.set(day, (totals.get(day) ?? 0) + p.caloriesBurnt);
+  }
+
+  const weeklyTotal = round1(recent.reduce((sum, p) => sum + p.caloriesBurnt, 0));
+  const progressPercent = user.weeklyGoal > 0 ? Math.min(100, Math.round((weeklyTotal / user.weeklyGoal) * 100)) : 0;
 
   res.json({
     weeklyTotal,
     weeklyGoal: user.weeklyGoal,
-    progressPercent: Math.min(100, Math.round((weeklyTotal / user.weeklyGoal) * 100)),
+    progressPercent,
     sessionsThisWeek: recent.length,
+    daily: days.map((date) => ({ date, calories: round1(totals.get(date) ?? 0) })),
   });
 }

@@ -14,7 +14,8 @@ export class HistoryService {
   }
 
   summary() {
-    return this.http.get<DashboardSummary>(`${environment.apiUrl}/history/summary`);
+    const tz = new Date().getTimezoneOffset();
+    return this.http.get<DashboardSummary>(`${environment.apiUrl}/history/summary`, { params: { tz } });
   }
 
   exportCsvUrl(): string {

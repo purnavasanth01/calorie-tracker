@@ -4,51 +4,47 @@ import { User } from "../models/User";
 
 const PREMIUM_PRICE_USD_CENTS = 499;
 
-export async function createCheckoutSession(req: Request, res: Response): Promise<void> {
-  try {
-    const session = await stripe.checkout.sessions.create({
-      mode: "payment",
-      payment_method_types: ["card"],
-      client_reference_id: req.user!._id.toString(),
-      line_items: [
-        {
-          price_data: {
-            currency: "usd",
-            unit_amount: PREMIUM_PRICE_USD_CENTS,
-            product_data: {
-              name: "Calorie Tracker Premium",
-              description: "Unlimited history + CSV export, one-time unlock",
-            },
-          },
-          quantity: 1,
-        },
-      ],
-      success_url: `${process.env.CLIENT_URL}/premium?success=true&session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${process.env.CLIENT_URL}/premium?canceled=true`,
-    });
+function markPremium(userId: string): Promise<unknown> {
+  return User.findByIdAndUpdate(userId, { isPremium: true }).exec();
+}
 
-    res.json({ url: session.url });
-  } catch (err) {
-    res.status(500).json({ error: (err as Error).message });
-  }
+export async function createCheckoutSession(req: Request, res: Response): Promise<void> {
+  const session = await stripe.checkout.sessions.create({
+    mode: "payment",
+    payment_method_types: ["card"],
+    client_reference_id: req.user!._id.toString(),
+    line_items: [
+      {
+        price_data: {
+          currency: "usd",
+          unit_amount: PREMIUM_PRICE_USD_CENTS,
+          product_data: {
+            name: "Calorie Tracker Premium",
+            description: "Unlimited history + CSV export, one-time unlock",
+          },
+        },
+        quantity: 1,
+      },
+    ],
+    success_url: `${process.env.CLIENT_URL}/premium?success=true&session_id={CHECKOUT_SESSION_ID}`,
+    cancel_url: `${process.env.CLIENT_URL}/premium?canceled=true`,
+  });
+
+  res.json({ url: session.url });
 }
 
 export async function verifyCheckoutSession(req: Request, res: Response): Promise<void> {
-  const { sessionId } = req.params;
+  const userId = req.user!._id.toString();
+  const session = await stripe.checkout.sessions.retrieve(req.params.sessionId);
 
-  try {
-    const session = await stripe.checkout.sessions.retrieve(sessionId);
-
-    if (session.payment_status === "paid" && session.client_reference_id) {
-      await User.findByIdAndUpdate(session.client_reference_id, { isPremium: true });
-      res.json({ premium: true });
-      return;
-    }
-
-    res.json({ premium: false });
-  } catch (err) {
-    res.status(500).json({ error: (err as Error).message });
+  if (session.client_reference_id !== userId) {
+    res.status(403).json({ error: "This payment belongs to a different account" });
+    return;
   }
+
+  const premium = session.payment_status === "paid";
+  if (premium) await markPremium(userId);
+  res.json({ premium });
 }
 
 export async function handleWebhook(req: Request, res: Response): Promise<void> {
@@ -70,9 +66,7 @@ export async function handleWebhook(req: Request, res: Response): Promise<void> 
 
   if (event.type === "checkout.session.completed") {
     const session = event.data.object as { client_reference_id?: string };
-    if (session.client_reference_id) {
-      await User.findByIdAndUpdate(session.client_reference_id, { isPremium: true });
-    }
+    if (session.client_reference_id) await markPremium(session.client_reference_id);
   }
 
   res.json({ received: true });

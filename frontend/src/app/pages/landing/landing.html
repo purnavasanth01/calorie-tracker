@@ -1,0 +1,77 @@
+<section class="hero">
+  <header class="site-header">
+    <a class="wordmark" routerLink="/">
+      <app-logo class="mark" [draw]="true" />
+      CalTrack
+    </a>
+    <nav class="site-nav" aria-label="Main">
+      <button type="button" class="nav-link" (click)="scrollTo('how')">How it works</button>
+      <a class="nav-link" routerLink="/login">Log in</a>
+      <button type="button" class="btn btn-light" (click)="tryDemo()" [disabled]="startingDemo()">Try the demo</button>
+    </nav>
+  </header>
+
+  <div class="hero-inner">
+    <div class="hero-copy">
+      <p class="eyebrow reveal">Calorie intelligence</p>
+
+      <h1 class="kinetic" aria-label="Know what every workout is worth.">
+        @for (word of headline; track $index) {
+          <span class="word" aria-hidden="true"
+            ><span [style.--i]="$index" [class.gold]="$last">{{ word }}</span></span
+          >
+        }
+      </h1>
+      <p class="lede reveal" style="--i: 7">
+        Log a session and a machine-learning model estimates the calories you burned, from your heart rate,
+        duration and body temperature.
+      </p>
+      <div class="cta reveal" style="--i: 8">
+        <button type="button" class="btn btn-light" (click)="tryDemo()" [disabled]="startingDemo()">
+          {{ startingDemo() ? 'Opening the demo…' : 'Try the live demo' }}
+        </button>
+        <a class="btn btn-ghost-light" routerLink="/login" [queryParams]="{ mode: 'signup' }">Create an account</a>
+      </div>
+      <p class="cta-note reveal" style="--i: 9">No sign-up needed. The demo comes with two weeks of sample workouts.</p>
+      @if (demoError()) {
+        <p class="alert" role="alert">{{ demoError() }}</p>
+      }
+    </div>
+
+    <app-hero-visual class="reveal" style="--i: 4" />
+  </div>
+</section>
+
+<app-tech-ribbon />
+
+<main>
+  <app-how-it-works id="how" />
+
+  <section class="numbers" (appInView)="statsVisible.set(true)">
+    @for (stat of stats; track stat.label) {
+      <div class="number">
+        <p class="figure">
+          {{ stat.prefix }}<span [appCountUp]="statsVisible() ? stat.value : 0" [decimals]="stat.decimals"></span>
+        </p>
+        <p>{{ stat.label }}</p>
+      </div>
+    }
+  </section>
+
+  <section class="closing scroll-reveal" appInView>
+    <app-logo class="closing-mark" />
+    <h2>Ready when you are.</h2>
+    <p>Explore the demo in one click, or create your own account to start logging.</p>
+    <div class="cta">
+      <button type="button" class="btn btn-primary" (click)="tryDemo()" [disabled]="startingDemo()">
+        {{ startingDemo() ? 'Opening the demo…' : 'Try the live demo' }}
+      </button>
+      <a class="btn btn-outline" routerLink="/login" [queryParams]="{ mode: 'signup' }">Create an account</a>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <p>© {{ year }} CalTrack · Built with Angular, Express, MongoDB and XGBoost</p>
+  <a href="https://github.com/purnavasanth01/calorie-tracker" target="_blank" rel="noopener">View the source on GitHub</a>
+</footer>

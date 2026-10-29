@@ -1,93 +1,80 @@
 <div class="page-container narrow">
-  <h1>Log a Workout</h1>
-  <p>Enter your session details and we'll predict the calories burnt.</p>
+  <header class="page-head reveal">
+    <div>
+      <p class="eyebrow">New session</p>
+      <h1>Log a workout</h1>
+      <p>Enter your session details and the model will estimate the calories you burned.</p>
+    </div>
+  </header>
 
   @if (result(); as r) {
-    <div class="card result-card">
-      <span class="result-label">Estimated Calories Burnt</span>
-      <div class="result-value">{{ r.caloriesBurnt }} <span>kcal</span></div>
-      <button class="btn btn-outline" (click)="logAnother()">Log another workout</button>
-    </div>
-  } @else {
-    <form class="card" [formGroup]="form" (ngSubmit)="submit()">
-      <div class="grid">
-        <div class="field">
-          <label class="field-label">Gender</label>
-          <select class="input" formControlName="gender">
-            <option value="male">Male</option>
-            <option value="female">Female</option>
-          </select>
-        </div>
+    <section class="card card-dark result pop" appTilt aria-live="polite">
+      <p class="eyebrow">
+        Estimated calories burned
+        <span
+          class="info"
+          tabindex="0"
+          role="img"
+          aria-label="Predicted by an XGBoost model trained on 15,000 workouts. Typical error: about 1.5 kcal."
+          data-tip="Predicted by an XGBoost model trained on 15,000 workouts. Typical error: about 1.5 kcal."
+          >i</span
+        >
+      </p>
+      <p class="result-value figure">
 
-        <div class="field">
-          <label class="field-label">Age (years)</label>
-          <input
-            class="input"
-            type="number"
-            formControlName="age"
-            [class.input-invalid]="form.controls.age.invalid && form.controls.age.touched"
-          />
-        </div>
-
-        <div class="field">
-          <label class="field-label">Height (cm)</label>
-          <input
-            class="input"
-            type="number"
-            formControlName="height"
-            [class.input-invalid]="form.controls.height.invalid && form.controls.height.touched"
-          />
-        </div>
-
-        <div class="field">
-          <label class="field-label">Weight (kg)</label>
-          <input
-            class="input"
-            type="number"
-            formControlName="weight"
-            [class.input-invalid]="form.controls.weight.invalid && form.controls.weight.touched"
-          />
-        </div>
-
-        <div class="field">
-          <label class="field-label">Duration (minutes)</label>
-          <input
-            class="input"
-            type="number"
-            formControlName="duration"
-            [class.input-invalid]="form.controls.duration.invalid && form.controls.duration.touched"
-          />
-        </div>
-
-        <div class="field">
-          <label class="field-label">Heart Rate (bpm)</label>
-          <input
-            class="input"
-            type="number"
-            formControlName="heartRate"
-            [class.input-invalid]="form.controls.heartRate.invalid && form.controls.heartRate.touched"
-          />
-        </div>
-
-        <div class="field">
-          <label class="field-label">Body Temp (°C)</label>
-          <input
-            class="input"
-            type="number"
-            step="0.1"
-            formControlName="bodyTemp"
-            [class.input-invalid]="form.controls.bodyTemp.invalid && form.controls.bodyTemp.touched"
-          />
-        </div>
+        <span [appCountUp]="r.caloriesBurnt" [decimals]="1" aria-hidden="true"></span>
+        <span class="sr-only">{{ r.caloriesBurnt | number: '1.0-1' }}</span>
+        <span class="unit">kcal</span>
+      </p>
+      <p>
+        {{ r.duration | number: '1.0-1' }} min · {{ r.heartRate | number: '1.0-0' }} bpm · {{ r.bodyTemp | number: '1.1-1' }} °C —
+        saved to your history.
+      </p>
+      <div class="result-actions">
+        <button class="btn btn-light" type="button" (click)="logAnother()">Log another workout</button>
+        <a class="btn btn-ghost-light" routerLink="/history">View history</a>
       </div>
+    </section>
+  } @else if (submitting()) {
+    <section class="card card-dark calculating pop" role="status" aria-live="polite">
+      <app-logo class="calc-mark" [draw]="true" [pulse]="true" />
+      <app-ecg class="calc-ecg" />
+      <p class="eyebrow">{{ stage() }}…</p>
+    </section>
+  } @else {
+    <form class="card reveal" style="--i: 1" [formGroup]="form" (ngSubmit)="submit()">
+      <fieldset class="form-section">
+        <legend>About you</legend>
+        <p>
+          @if (hasProfileDefaults) {
+            Pre-filled from your <a routerLink="/profile">profile</a>.
+          } @else {
+            Save these in your <a routerLink="/profile">profile</a> to skip this step next time.
+          }
+        </p>
+        <div class="form-grid">
+          <app-gender-toggle [control]="form.controls.gender" />
+          @for (field of aboutYouFields; track field) {
+            <app-number-input [field]="field" [control]="form.controls[field]" />
+          }
+        </div>
+      </fieldset>
+
+      <fieldset class="form-section">
+        <legend>This session</legend>
+        <p>Use the readings from your watch or fitness tracker.</p>
+        <div class="form-grid">
+          @for (field of sessionFields; track field) {
+            <app-number-input [field]="field" [control]="form.controls[field]" />
+          }
+        </div>
+      </fieldset>
 
       @if (error()) {
-        <p class="error-msg">{{ error() }}</p>
+        <p class="alert" role="alert">{{ error() }}</p>
       }
 
-      <button class="btn btn-primary submit-btn" type="submit" [disabled]="submitting()">
-        {{ submitting() ? 'Predicting...' : 'Predict Calories Burnt' }}
-      </button>
+      <button class="btn btn-primary btn-block" type="submit">Predict calories burned</button>
     </form>
   }
 </div>

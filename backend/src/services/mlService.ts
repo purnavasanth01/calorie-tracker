@@ -11,6 +11,8 @@ export interface PredictionInput {
   bodyTemp: number;
 }
 
+const PREDICTION_TIMEOUT_MS = 20_000;
+
 export function predictCalories(input: PredictionInput): Promise<number> {
   const pythonPath = process.env.PYTHON_PATH;
   const mlDir = process.env.ML_DIR;
@@ -22,7 +24,7 @@ export function predictCalories(input: PredictionInput): Promise<number> {
   const scriptPath = path.join(mlDir, "predict.py");
 
   return new Promise((resolve, reject) => {
-    const child = spawn(pythonPath, [scriptPath]);
+    const child = spawn(pythonPath, [scriptPath], { timeout: PREDICTION_TIMEOUT_MS });
 
     let stdout = "";
     let stderr = "";
@@ -35,7 +37,14 @@ export function predictCalories(input: PredictionInput): Promise<number> {
       stderr += chunk.toString();
     });
 
-    child.on("close", (code) => {
+    child.on("error", (err) => reject(new Error(`Could not start the prediction script: ${err.message}`)));
+    child.stdin.on("error", () => {});
+
+    child.on("close", (code, signal) => {
+      if (signal === "SIGTERM") {
+        reject(new Error(`Prediction timed out after ${PREDICTION_TIMEOUT_MS / 1000}s`));
+        return;
+      }
       if (code !== 0) {
         reject(new Error(`Prediction script failed: ${stderr || stdout}`));
         return;

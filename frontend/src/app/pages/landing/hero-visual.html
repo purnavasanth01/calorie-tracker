@@ -1,0 +1,20 @@
+<div class="stage" appParallax aria-hidden="true">
+  <span class="halo depth" style="--depth: 8"></span>
+  <span class="orb orb-large depth float" style="--depth: 34; --float-delay: -2s"></span>
+  <span class="orb orb-small depth float" style="--depth: -24; --float-delay: -4s"></span>
+
+  <div class="result-card depth float" style="--depth: 16">
+    <p class="label">Morning run · 28 min</p>
+    <p class="value figure"><span [appCountUp]="185"></span><span class="unit">kcal</span></p>
+    <app-ecg class="ecg" />
+    <p class="meta">112 bpm · 40.4 °C</p>
+  </div>
+
+  <div class="goal-card depth float" style="--depth: -14; --float-delay: -3s">
+    <app-progress-ring class="mini-ring" [percent]="70" />
+    <div>
+      <p class="goal-value figure">70%</p>
+      <p class="label">of weekly goal</p>
+    </div>
+  </div>
+</div>

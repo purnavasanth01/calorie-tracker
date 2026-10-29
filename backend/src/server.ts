@@ -8,6 +8,8 @@ import passport from "passport";
 import { connectDB } from "./config/db";
 import { configurePassport } from "./config/passport";
 import { webhookHandler } from "./routes/payment";
+import { errorHandler } from "./middleware/errorHandler";
+import { ensureAuth } from "./middleware/ensureAuth";
 
 import authRoutes from "./routes/auth";
 import predictRoutes from "./routes/predict";
@@ -19,13 +21,15 @@ const PORT = process.env.PORT || 5000;
 const isProduction = process.env.NODE_ENV === "production";
 
 async function main() {
+  if (!process.env.SESSION_SECRET) {
+    throw new Error("SESSION_SECRET is not set");
+  }
+
   await connectDB();
   configurePassport();
 
   const app = express();
 
-  // On Render, requests arrive through a proxy that handles HTTPS. Trust it so
-  // Express knows the original request was HTTPS (needed for secure cookies).
   if (isProduction) {
     app.set("trust proxy", 1);
   }
@@ -43,7 +47,7 @@ async function main() {
 
   app.use(
     session({
-      secret: process.env.SESSION_SECRET || "",
+      secret: process.env.SESSION_SECRET,
       resave: false,
       saveUninitialized: false,
       store: MongoStore.create({ mongoUrl: process.env.MONGODB_URI }),
@@ -60,14 +64,16 @@ async function main() {
   app.use(passport.session());
 
   app.use("/api/auth", authRoutes);
-  app.use("/api/predict", predictRoutes);
-  app.use("/api/history", historyRoutes);
-  app.use("/api/payment", paymentRoutes);
-  app.use("/api/profile", profileRoutes);
+  app.use("/api/predict", ensureAuth, predictRoutes);
+  app.use("/api/history", ensureAuth, historyRoutes);
+  app.use("/api/payment", ensureAuth, paymentRoutes);
+  app.use("/api/profile", ensureAuth, profileRoutes);
 
   app.get("/api/health", (_req, res) => {
     res.json({ status: "ok" });
   });
+
+  app.use(errorHandler);
 
   app.listen(PORT, () => {
     console.log(`Server listening on port ${PORT}`);

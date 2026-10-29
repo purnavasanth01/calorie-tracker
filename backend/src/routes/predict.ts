@@ -1,9 +1,9 @@
 import { Router } from "express";
-import { ensureAuth } from "../middleware/ensureAuth";
+import { asyncHandler } from "../middleware/asyncHandler";
 import { createPrediction } from "../controllers/predictController";
 
 const router = Router();
 
-router.post("/", ensureAuth, createPrediction);
+router.post("/", asyncHandler(createPrediction));
 
 export default router;

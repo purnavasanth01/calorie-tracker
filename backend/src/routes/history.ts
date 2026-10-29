@@ -1,11 +1,11 @@
 import { Router } from "express";
-import { ensureAuth } from "../middleware/ensureAuth";
+import { asyncHandler } from "../middleware/asyncHandler";
 import { listHistory, exportHistory, getDashboardSummary } from "../controllers/historyController";
 
 const router = Router();
 
-router.get("/", ensureAuth, listHistory);
-router.get("/export", ensureAuth, exportHistory);
-router.get("/summary", ensureAuth, getDashboardSummary);
+router.get("/", asyncHandler(listHistory));
+router.get("/export", asyncHandler(exportHistory));
+router.get("/summary", asyncHandler(getDashboardSummary));
 
 export default router;
