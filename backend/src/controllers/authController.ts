@@ -3,6 +3,7 @@ import passport from "passport";
 import bcrypt from "bcryptjs";
 import { User, IUser } from "../models/User";
 import { createDemoUser } from "../services/demoService";
+import { parseTzOffset } from "../utils/time";
 import { signupProblem } from "../validation/account";
 
 const BCRYPT_ROUNDS = 12;
@@ -51,7 +52,7 @@ export function login(req: Request, res: Response, next: NextFunction): void {
 }
 
 export async function demo(req: Request, res: Response, next: NextFunction): Promise<void> {
-  logIn(req, res, next, await createDemoUser(), 201);
+  logIn(req, res, next, await createDemoUser(parseTzOffset(req.body?.tz)), 201);
 }
 
 export function logout(req: Request, res: Response, next: NextFunction): void {

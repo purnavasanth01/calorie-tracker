@@ -141,3 +141,20 @@
     display: none;
   }
 }
+
+@media (max-width: 480px) {
+  .links {
+    justify-content: space-between;
+    gap: 8px;
+
+    a {
+      font-size: 0.8rem;
+    }
+  }
+}
+
+@media (max-width: 359px) {
+  .links {
+    mask-image: linear-gradient(90deg, #000 85%, transparent);
+  }
+}

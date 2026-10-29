@@ -2,9 +2,9 @@ import { randomUUID } from "crypto";
 import bcrypt from "bcryptjs";
 import { User, IUser } from "../models/User";
 import { Prediction } from "../models/Prediction";
+import { DAY_MS, localDay, localMidnight } from "../utils/time";
 
 const DEMO_TTL_MS = 24 * 60 * 60 * 1000;
-const DAY_MS = 24 * 60 * 60 * 1000;
 
 const DEMO_PROFILE = { gender: "male", age: 29, height: 178, weight: 74 } as const;
 
@@ -21,10 +21,10 @@ const SAMPLE_SESSIONS = [
   { daysAgo: 13, hour: 18, duration: 24, heartRate: 107, bodyTemp: 40.2, caloriesBurnt: 142.6 },
 ];
 
-function daysAgoAt(daysAgo: number, hour: number): Date {
-  const date = new Date(Date.now() - daysAgo * DAY_MS);
-  date.setHours(hour, 0, 0, 0);
-  return date.getTime() > Date.now() ? new Date(Date.now() - 60 * 60 * 1000) : date;
+function sessionTime(daysAgo: number, hour: number, tzOffset: number): Date {
+  const today = localMidnight(localDay(new Date(), tzOffset), tzOffset).getTime();
+  const time = new Date(today - daysAgo * DAY_MS + hour * 60 * 60 * 1000);
+  return time.getTime() > Date.now() ? new Date(time.getTime() - DAY_MS) : time;
 }
 
 async function removeExpiredDemoUsers(): Promise<void> {
@@ -37,7 +37,7 @@ async function removeExpiredDemoUsers(): Promise<void> {
   await User.deleteMany({ _id: { $in: ids } });
 }
 
-export async function createDemoUser(): Promise<IUser> {
+export async function createDemoUser(tzOffset: number): Promise<IUser> {
   await removeExpiredDemoUsers();
 
   const user = await User.create({
@@ -55,7 +55,7 @@ export async function createDemoUser(): Promise<IUser> {
       ...session,
       ...DEMO_PROFILE,
       user: user._id,
-      createdAt: daysAgoAt(daysAgo, hour),
+      createdAt: sessionTime(daysAgo, hour, tzOffset),
     }))
   );
 
