@@ -1,73 +1,33 @@
 import { Request, Response } from "express";
-import { stripe } from "../config/stripe";
 import { User } from "../models/User";
 
-const PREMIUM_PRICE_USD_CENTS = 499;
+const CARD_NUMBER = /^\d{16}$/;
+const EXPIRY = /^(0[1-9]|1[0-2])\/(\d{2})$/;
+const CVC = /^\d{3,4}$/;
 
-function markPremium(userId: string): Promise<unknown> {
-  return User.findByIdAndUpdate(userId, { isPremium: true }).exec();
+function isExpired(month: number, twoDigitYear: number): boolean {
+  return new Date(2000 + twoDigitYear, month, 1) <= new Date();
 }
 
-export async function createCheckoutSession(req: Request, res: Response): Promise<void> {
-  const session = await stripe.checkout.sessions.create({
-    mode: "payment",
-    payment_method_types: ["card"],
-    client_reference_id: req.user!._id.toString(),
-    line_items: [
-      {
-        price_data: {
-          currency: "usd",
-          unit_amount: PREMIUM_PRICE_USD_CENTS,
-          product_data: {
-            name: "Calorie Tracker Premium",
-            description: "Unlimited history + CSV export, one-time unlock",
-          },
-        },
-        quantity: 1,
-      },
-    ],
-    success_url: `${process.env.CLIENT_URL}/premium?success=true&session_id={CHECKOUT_SESSION_ID}`,
-    cancel_url: `${process.env.CLIENT_URL}/premium?canceled=true`,
-  });
-
-  res.json({ url: session.url });
+function checkoutProblem(body: Record<string, unknown>): string | null {
+  const { name, cardNumber, expiry, cvc } = body;
+  if (typeof name !== "string" || !name.trim()) return "Please enter the name on the card";
+  if (typeof cardNumber !== "string" || !CARD_NUMBER.test(cardNumber.replace(/\s/g, ""))) {
+    return "Please enter a 16-digit card number";
+  }
+  const match = typeof expiry === "string" ? EXPIRY.exec(expiry) : null;
+  if (!match || isExpired(Number(match[1]), Number(match[2]))) return "Please enter a valid expiry date (MM/YY)";
+  if (typeof cvc !== "string" || !CVC.test(cvc)) return "Please enter a valid CVC";
+  return null;
 }
 
-export async function verifyCheckoutSession(req: Request, res: Response): Promise<void> {
-  const userId = req.user!._id.toString();
-  const session = await stripe.checkout.sessions.retrieve(req.params.sessionId);
-
-  if (session.client_reference_id !== userId) {
-    res.status(403).json({ error: "This payment belongs to a different account" });
+export async function checkout(req: Request, res: Response): Promise<void> {
+  const problem = checkoutProblem(req.body ?? {});
+  if (problem) {
+    res.status(400).json({ error: problem });
     return;
   }
 
-  const premium = session.payment_status === "paid";
-  if (premium) await markPremium(userId);
-  res.json({ premium });
-}
-
-export async function handleWebhook(req: Request, res: Response): Promise<void> {
-  const signature = req.headers["stripe-signature"];
-  const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
-
-  if (!signature || !webhookSecret) {
-    res.status(400).send("Missing Stripe signature or webhook secret");
-    return;
-  }
-
-  let event;
-  try {
-    event = stripe.webhooks.constructEvent(req.body, signature, webhookSecret);
-  } catch (err) {
-    res.status(400).send(`Webhook signature verification failed: ${(err as Error).message}`);
-    return;
-  }
-
-  if (event.type === "checkout.session.completed") {
-    const session = event.data.object as { client_reference_id?: string };
-    if (session.client_reference_id) await markPremium(session.client_reference_id);
-  }
-
-  res.json({ received: true });
+  const user = await User.findByIdAndUpdate(req.user!._id, { isPremium: true }, { new: true });
+  res.json({ user });
 }

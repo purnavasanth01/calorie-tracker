@@ -1,10 +1,10 @@
 export const RANGES = {
-  age: [10, 100],
-  height: [100, 250],
-  weight: [30, 200],
-  duration: [1, 120],
-  heartRate: [60, 200],
-  bodyTemp: [35, 43],
+  age: [20, 79],
+  height: [123, 222],
+  weight: [36, 132],
+  duration: [1, 30],
+  heartRate: [67, 128],
+  bodyTemp: [37.1, 41.5],
   weeklyGoal: [100, 20000],
 } as const;
 

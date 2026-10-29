@@ -18,6 +18,10 @@ export class HistoryService {
     return this.http.get<DashboardSummary>(`${environment.apiUrl}/history/summary`, { params: { tz } });
   }
 
+  remove(id: string) {
+    return this.http.delete<void>(`${environment.apiUrl}/history/${id}`);
+  }
+
   exportCsvUrl(): string {
     return `${environment.apiUrl}/history/export`;
   }

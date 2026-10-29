@@ -62,7 +62,7 @@
 
       <fieldset class="form-section">
         <legend>This session</legend>
-        <p>Use the readings from your watch or fitness tracker.</p>
+        <p>Use the readings from your watch or fitness tracker. Limits match the 15,000 workouts the model learned from.</p>
         <div class="form-grid">
           @for (field of sessionFields; track field) {
             <app-number-input [field]="field" [control]="form.controls[field]" />

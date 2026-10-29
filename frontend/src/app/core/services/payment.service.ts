@@ -1,21 +1,20 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
+import { User } from '../models/user.model';
+
+export interface CardDetails {
+  name: string;
+  cardNumber: string;
+  expiry: string;
+  cvc: string;
+}
 
 @Injectable({ providedIn: 'root' })
 export class PaymentService {
-  constructor(private http: HttpClient) {}
+  private http = inject(HttpClient);
 
-  createCheckoutSession() {
-    return this.http.post<{ url: string }>(
-      `${environment.apiUrl}/payment/create-checkout-session`,
-      {}
-    );
-  }
-
-  verifySession(sessionId: string) {
-    return this.http.get<{ premium: boolean }>(
-      `${environment.apiUrl}/payment/verify/${sessionId}`
-    );
+  checkout(card: CardDetails) {
+    return this.http.post<{ user: User }>(`${environment.apiUrl}/payment/checkout`, card);
   }
 }

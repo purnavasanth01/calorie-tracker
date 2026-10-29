@@ -1,7 +1,7 @@
 {
   "name": "calorie-tracker-backend",
   "version": "1.0.0",
-  "description": "Backend API for the Calorie Tracker app (Express, TypeScript, MongoDB, Passport OAuth, Stripe)",
+  "description": "Backend API for the Calorie Tracker app (Express, TypeScript, MongoDB, Passport, XGBoost)",
   "main": "dist/server.js",
   "scripts": {
     "dev": "ts-node-dev --respawn --transpile-only src/server.ts",
@@ -19,8 +19,7 @@
     "express-session": "^1.18.0",
     "mongoose": "^8.5.0",
     "passport": "^0.7.0",
-    "passport-local": "^1.0.0",
-    "stripe": "^16.6.0"
+    "passport-local": "^1.0.0"
   },
   "devDependencies": {
     "@types/cors": "^2.8.17",

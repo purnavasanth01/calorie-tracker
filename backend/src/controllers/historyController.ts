@@ -1,4 +1,5 @@
 import { Request, Response } from "express";
+import { Types } from "mongoose";
 import { Prediction } from "../models/Prediction";
 
 const FREE_TIER_LIMIT = 5;
@@ -86,4 +87,14 @@ export async function getDashboardSummary(req: Request, res: Response): Promise<
     sessionsThisWeek: recent.length,
     daily: days.map((date) => ({ date, calories: round1(totals.get(date) ?? 0) })),
   });
+}
+
+export async function deletePrediction(req: Request, res: Response): Promise<void> {
+  const { id } = req.params;
+  const deleted = Types.ObjectId.isValid(id) && (await Prediction.findOneAndDelete({ _id: id, user: req.user!._id }));
+  if (!deleted) {
+    res.status(404).json({ error: "Workout not found" });
+    return;
+  }
+  res.status(204).end();
 }
