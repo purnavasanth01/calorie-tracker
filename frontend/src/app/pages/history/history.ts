@@ -2,10 +2,8 @@ import { Component, LOCALE_ID, OnInit, computed, inject, signal } from '@angular
 import { RouterLink } from '@angular/router';
 import { DatePipe, DecimalPipe, formatDate } from '@angular/common';
 import { HistoryService } from '../../core/services/history.service';
-import { Gender, Prediction } from '../../core/models/prediction.model';
+import { Prediction } from '../../core/models/prediction.model';
 import { EmptyState } from '../../shared/empty-state/empty-state';
-
-type GenderFilter = 'all' | Gender;
 
 const DATE_FORMAT = 'MMM d, y';
 
@@ -20,11 +18,6 @@ export class History implements OnInit {
   private locale = inject(LOCALE_ID);
 
   readonly dateFormat = DATE_FORMAT;
-  readonly genderOptions: { value: GenderFilter; label: string }[] = [
-    { value: 'all', label: 'All' },
-    { value: 'male', label: 'Male' },
-    { value: 'female', label: 'Female' },
-  ];
 
   predictions = signal<Prediction[]>([]);
   limited = signal(false);
@@ -32,25 +25,54 @@ export class History implements OnInit {
   loading = signal(true);
   error = signal(false);
   search = signal('');
-  genderFilter = signal<GenderFilter>('all');
+  confirmingId = signal<string | null>(null);
+  deletingId = signal<string | null>(null);
+  deleteError = signal(false);
 
   showUpsell = computed(() => this.limited() && this.predictions().length >= this.limit());
 
   filtered = computed(() => {
     const term = this.search().trim().toLowerCase();
-    const gender = this.genderFilter();
-
-    return this.predictions().filter((p) => {
-      const matchesGender = gender === 'all' || p.gender === gender;
-      const searchable = [formatDate(p.createdAt, DATE_FORMAT, this.locale), p.caloriesBurnt.toFixed(0), p.duration];
-      const matchesSearch = !term || searchable.some((value) => String(value).toLowerCase().includes(term));
-      return matchesGender && matchesSearch;
-    });
+    if (!term) return this.predictions();
+    return this.predictions().filter((p) =>
+      [formatDate(p.createdAt, DATE_FORMAT, this.locale), p.caloriesBurnt.toFixed(0), p.duration].some((value) =>
+        String(value).toLowerCase().includes(term)
+      )
+    );
   });
 
   exportUrl = this.historyService.exportCsvUrl();
 
   ngOnInit(): void {
+    this.load();
+  }
+
+  setSearch(value: string): void {
+    this.search.set(value);
+  }
+
+  remove(prediction: Prediction): void {
+    if (this.confirmingId() !== prediction._id) {
+      this.confirmingId.set(prediction._id);
+      return;
+    }
+
+    this.deletingId.set(prediction._id);
+    this.deleteError.set(false);
+    this.historyService.remove(prediction._id).subscribe({
+      next: () => {
+        this.confirmingId.set(null);
+        this.deletingId.set(null);
+        this.load();
+      },
+      error: () => {
+        this.deletingId.set(null);
+        this.deleteError.set(true);
+      },
+    });
+  }
+
+  private load(): void {
     this.historyService.list().subscribe({
       next: (res) => {
         this.predictions.set(res.predictions);
@@ -63,13 +85,5 @@ export class History implements OnInit {
         this.loading.set(false);
       },
     });
-  }
-
-  setSearch(value: string): void {
-    this.search.set(value);
-  }
-
-  setGenderFilter(value: GenderFilter): void {
-    this.genderFilter.set(value);
   }
 }

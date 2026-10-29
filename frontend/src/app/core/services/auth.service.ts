@@ -1,5 +1,5 @@
 import { Injectable, inject, signal } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
 import { environment } from '../../../environments/environment';
@@ -25,8 +25,8 @@ export class AuthService {
       await this.authenticate('demo', {});
       await this.router.navigateByUrl('/dashboard');
       return null;
-    } catch {
-      return "The demo couldn't start. Please try again in a moment.";
+    } catch (err) {
+      return (err as HttpErrorResponse).error?.error ?? "The demo couldn't start. Please try again in a moment.";
     }
   }
 
@@ -39,7 +39,7 @@ export class AuthService {
 
   async loadCurrentUser(): Promise<void> {
     try {
-      const res = await firstValueFrom(this.http.get<{ user: User }>(`${environment.apiUrl}/auth/me`));
+      const res = await firstValueFrom(this.http.get<{ user: User | null }>(`${environment.apiUrl}/auth/me`));
       this.currentUser.set(res.user);
     } catch {
       this.currentUser.set(null);

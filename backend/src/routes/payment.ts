@@ -1,12 +1,9 @@
 import { Router } from "express";
 import { asyncHandler } from "../middleware/asyncHandler";
-import { createCheckoutSession, verifyCheckoutSession, handleWebhook } from "../controllers/paymentController";
+import { checkout } from "../controllers/paymentController";
 
 const router = Router();
 
-router.post("/create-checkout-session", asyncHandler(createCheckoutSession));
-router.get("/verify/:sessionId", asyncHandler(verifyCheckoutSession));
-
-export const webhookHandler = asyncHandler(handleWebhook);
+router.post("/checkout", asyncHandler(checkout));
 
 export default router;

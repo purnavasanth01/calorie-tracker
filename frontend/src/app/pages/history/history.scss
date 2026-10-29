@@ -58,8 +58,10 @@
   font-size: 0.8rem;
 }
 
-.capitalize {
-  text-transform: capitalize;
+.details {
+  margin-top: 2px;
+  font-size: 0.8rem;
+  white-space: normal;
 }
 
 .no-match {
@@ -70,4 +72,30 @@
 .count {
   margin: 16px 0 0;
   font-size: 0.85rem;
+}
+
+.actions {
+  width: 1%;
+  text-align: right;
+}
+
+.delete {
+  padding: 6px 10px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background: none;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--color-stone);
+  cursor: pointer;
+
+  &:hover,
+  &.confirm {
+    border-color: rgba(122, 46, 46, 0.3);
+    color: var(--color-burgundy);
+  }
+
+  &.confirm {
+    background: rgba(122, 46, 46, 0.06);
+  }
 }

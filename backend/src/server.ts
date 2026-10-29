@@ -7,9 +7,9 @@ import passport from "passport";
 
 import { connectDB } from "./config/db";
 import { configurePassport } from "./config/passport";
-import { webhookHandler } from "./routes/payment";
 import { errorHandler } from "./middleware/errorHandler";
 import { ensureAuth } from "./middleware/ensureAuth";
+import { startPredictionWorker } from "./services/mlService";
 
 import authRoutes from "./routes/auth";
 import predictRoutes from "./routes/predict";
@@ -26,6 +26,7 @@ async function main() {
   }
 
   await connectDB();
+  startPredictionWorker();
   configurePassport();
 
   const app = express();
@@ -40,8 +41,6 @@ async function main() {
       credentials: true,
     })
   );
-
-  app.post("/api/payment/webhook", express.raw({ type: "application/json" }), webhookHandler);
 
   app.use(express.json());
 

@@ -49,18 +49,11 @@
             (input)="setSearch($any($event.target).value)"
           />
         </label>
-        <div class="segmented" role="group" aria-label="Filter by gender">
-          @for (option of genderOptions; track option.value) {
-            <button
-              type="button"
-              [attr.aria-pressed]="genderFilter() === option.value"
-              (click)="setGenderFilter(option.value)"
-            >
-              {{ option.label }}
-            </button>
-          }
-        </div>
       </div>
+
+      @if (deleteError()) {
+        <p class="alert" role="alert">We couldn't delete that workout. Please try again.</p>
+      }
 
       @if (filtered().length === 0) {
         <p class="no-match">No sessions match your search.</p>
@@ -70,11 +63,11 @@
             <thead>
               <tr>
                 <th scope="col">Date</th>
-                <th scope="col" class="hide-sm">Gender</th>
-                <th scope="col" class="num">Duration</th>
+                <th scope="col" class="num hide-sm">Duration</th>
                 <th scope="col" class="num hide-sm">Heart rate</th>
                 <th scope="col" class="num hide-sm">Body temp</th>
                 <th scope="col" class="num">Calories</th>
+                <th scope="col"><span class="sr-only">Actions</span></th>
               </tr>
             </thead>
             <tbody>
@@ -83,12 +76,28 @@
                   <td>
                     {{ p.createdAt | date: dateFormat }}
                     <span class="time muted">{{ p.createdAt | date: 'h:mm a' }}</span>
+                    <span class="details muted show-sm">
+                      {{ p.duration | number: '1.0-1' }} min · {{ p.heartRate | number: '1.0-0' }} bpm ·
+                      {{ p.bodyTemp | number: '1.1-1' }} °C
+                    </span>
                   </td>
-                  <td class="hide-sm capitalize">{{ p.gender }}</td>
-                  <td class="num">{{ p.duration | number: '1.0-1' }} min</td>
+                  <td class="num hide-sm">{{ p.duration | number: '1.0-1' }} min</td>
                   <td class="num hide-sm">{{ p.heartRate | number: '1.0-0' }} bpm</td>
                   <td class="num hide-sm">{{ p.bodyTemp | number: '1.1-1' }} °C</td>
                   <td class="num kcal">{{ p.caloriesBurnt | number: '1.0-0' }} kcal</td>
+                  <td class="actions">
+                    <button
+                      type="button"
+                      class="delete"
+                      [class.confirm]="confirmingId() === p._id"
+                      [disabled]="deletingId() === p._id"
+                      [attr.aria-label]="(confirmingId() === p._id ? 'Confirm deleting' : 'Delete') + ' the workout from ' + (p.createdAt | date: dateFormat)"
+                      (click)="remove(p)"
+                      (keydown.escape)="confirmingId.set(null)"
+                    >
+                      {{ confirmingId() === p._id ? 'Confirm' : 'Delete' }}
+                    </button>
+                  </td>
                 </tr>
               }
             </tbody>

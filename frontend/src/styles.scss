@@ -486,6 +486,10 @@ button {
   color: var(--color-stone);
 }
 
+.show-sm {
+  display: none;
+}
+
 .muted {
   color: var(--color-stone);
 }
@@ -521,5 +525,9 @@ button {
 
   .hide-sm {
     display: none;
+  }
+
+  .show-sm {
+    display: block;
   }
 }

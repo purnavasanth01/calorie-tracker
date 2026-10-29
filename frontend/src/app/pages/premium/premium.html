@@ -7,17 +7,8 @@
     </div>
   </header>
 
-  @if (verifying()) {
-    <p class="alert alert-success" role="status">Confirming your payment…</p>
-  }
   @if (justUpgraded()) {
-    <p class="alert alert-success" role="status">Welcome to Premium. Your full history is now unlocked.</p>
-  }
-  @if (notice()) {
-    <p class="alert alert-neutral" role="status">{{ notice() }}</p>
-  }
-  @if (error()) {
-    <p class="alert" role="alert">{{ error() }}</p>
+    <p class="alert alert-success" role="status">Welcome to Premium. Your full history and CSV export are now unlocked.</p>
   }
 
   <div class="plans">
@@ -50,15 +41,66 @@
       @if (isPremium()) {
         <p class="current">You're a Premium member</p>
       } @else {
-        <button class="btn btn-light btn-block" type="button" (click)="upgrade()" [disabled]="redirecting()">
-          {{ redirecting() ? 'Redirecting to checkout…' : 'Upgrade to Premium' }}
-        </button>
+        <button class="btn btn-light btn-block" type="button" (click)="openCheckout()">Upgrade to Premium</button>
       }
     </section>
   </div>
 
-  <p class="fine-print muted">
-    Payments are processed securely by Stripe. In test mode, use card 4242 4242 4242 4242 with any future date and
-    CVC.
-  </p>
+  <p class="fine-print muted">This is a demo checkout. No real payment is taken.</p>
 </div>
+
+<dialog #checkout class="checkout" aria-labelledby="checkout-title" (close)="error.set(null)">
+  <form [formGroup]="form" (ngSubmit)="pay()">
+    <div class="checkout-head">
+      <h2 id="checkout-title">Checkout</h2>
+      <button type="button" class="close" aria-label="Close checkout" (click)="closeCheckout()">×</button>
+    </div>
+    <p class="demo-note">Demo checkout: the card details are filled in for you and no real payment is taken.</p>
+
+    <div class="order">
+      <span>CalTrack Premium · one-time</span>
+      <strong class="figure">$4.99</strong>
+    </div>
+
+    <div class="field">
+      <label class="field-label" for="card-name">Name on card</label>
+      <input class="input" id="card-name" formControlName="name" autocomplete="cc-name" [attr.aria-invalid]="isInvalid('name')" />
+    </div>
+    <div class="field">
+      <label class="field-label" for="card-number">Card number</label>
+      <input
+        class="input"
+        id="card-number"
+        formControlName="cardNumber"
+        inputmode="numeric"
+        autocomplete="cc-number"
+        [attr.aria-invalid]="isInvalid('cardNumber')"
+      />
+    </div>
+    <div class="card-row">
+      <div class="field">
+        <label class="field-label" for="card-expiry">Expiry (MM/YY)</label>
+        <input class="input" id="card-expiry" formControlName="expiry" autocomplete="cc-exp" [attr.aria-invalid]="isInvalid('expiry')" />
+      </div>
+      <div class="field">
+        <label class="field-label" for="card-cvc">CVC</label>
+        <input
+          class="input"
+          id="card-cvc"
+          formControlName="cvc"
+          inputmode="numeric"
+          autocomplete="cc-csc"
+          [attr.aria-invalid]="isInvalid('cvc')"
+        />
+      </div>
+    </div>
+
+    @if (error()) {
+      <p class="alert" role="alert">{{ error() }}</p>
+    }
+
+    <button class="btn btn-primary btn-block pay" type="submit" [disabled]="paying()" [attr.aria-busy]="paying()">
+      {{ paying() ? 'Processing…' : 'Pay $4.99' }}
+    </button>
+  </form>
+</dialog>

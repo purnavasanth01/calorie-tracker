@@ -65,9 +65,5 @@ export function logout(req: Request, res: Response, next: NextFunction): void {
 }
 
 export function me(req: Request, res: Response): void {
-  if (!req.isAuthenticated()) {
-    res.status(401).json({ error: "Not authenticated" });
-    return;
-  }
-  res.json({ user: req.user });
+  res.json({ user: req.isAuthenticated() ? req.user : null });
 }
