@@ -1,2 +1,9 @@
 <app-navbar />
+@if (waking()) {
+  <section class="waking" role="status">
+    <app-logo [draw]="true" [pulse]="true" />
+    <h2>Waking up the server…</h2>
+    <p class="muted">Free hosting sleeps when idle, so the first load can take up to a minute.</p>
+  </section>
+}
 <router-outlet />
