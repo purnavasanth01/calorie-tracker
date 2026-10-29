@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { Types } from "mongoose";
 import { Prediction } from "../models/Prediction";
+import { DAY_MS, localDay, localMidnight, parseTzOffset } from "../utils/time";
 
 const FREE_TIER_LIMIT = 5;
 
@@ -49,25 +50,18 @@ export async function exportHistory(req: Request, res: Response): Promise<void> 
 }
 
 const SUMMARY_DAYS = 7;
-const DAY_MS = 24 * 60 * 60 * 1000;
-const MAX_TZ_OFFSET_MINUTES = 14 * 60;
 
 const round1 = (n: number) => Math.round(n * 10) / 10;
 
-function localDay(date: Date, tzOffset: number): string {
-  return new Date(date.getTime() - tzOffset * 60_000).toISOString().slice(0, 10);
-}
-
 export async function getDashboardSummary(req: Request, res: Response): Promise<void> {
   const user = req.user!;
-  const tz = Number(req.query.tz);
-  const tzOffset = Number.isFinite(tz) && Math.abs(tz) <= MAX_TZ_OFFSET_MINUTES ? tz : 0;
+  const tzOffset = parseTzOffset(req.query.tz);
 
   const today = localDay(new Date(), tzOffset);
   const days = Array.from({ length: SUMMARY_DAYS }, (_, i) =>
     new Date(Date.parse(today) - (SUMMARY_DAYS - 1 - i) * DAY_MS).toISOString().slice(0, 10)
   );
-  const windowStart = new Date(Date.parse(days[0]) + tzOffset * 60_000);
+  const windowStart = localMidnight(days[0], tzOffset);
 
   const recent = await Prediction.find({ user: user._id, createdAt: { $gte: windowStart } });
 

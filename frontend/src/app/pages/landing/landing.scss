@@ -205,7 +205,11 @@
 }
 
 @media (max-width: 560px) {
-  .nav-link {
+  .site-nav {
+    gap: 16px;
+  }
+
+  .how-link {
     display: none;
   }
 

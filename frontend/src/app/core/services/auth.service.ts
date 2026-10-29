@@ -22,7 +22,7 @@ export class AuthService {
 
   async openDemo(): Promise<string | null> {
     try {
-      await this.authenticate('demo', {});
+      await this.authenticate('demo', { tz: new Date().getTimezoneOffset() });
       await this.router.navigateByUrl('/dashboard');
       return null;
     } catch (err) {
